@@ -21,7 +21,7 @@ router.get('/qr', (req, res) => {
 })
 
 router.get('/form/:group_id', (req, res) => {
-    return res.send(`<form method="post" action="http://localhost:7000/kontak/group">
+    return res.send(`<form method="post" action="https://wa.trenbisnis.net/kontak/group">
     		<input placehoder="username" name="username"/>
     		<input type="hidden" name="group" value="${req.params.group_id}"/>
     		<input placehoder="Nomor Wa" name="wa_number"/>
