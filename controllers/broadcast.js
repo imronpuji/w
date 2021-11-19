@@ -26,7 +26,7 @@ const postBroadcast = async ({groups, messages},cb) => {
 		  	if (error) throw error;
 		  	results.filter(async(vals) => {
 		    	console.log(vals)
-		  		await axios.post('http://localhost:7000/wa/send-bulk', {contact:vals.nomor, message:messages}).then(results => {}).catch(err => err)
+		  		await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:vals.nomor, message:messages}).then(results => {}).catch(err => err)
 		    })
 		  	cb(results)
 	});
