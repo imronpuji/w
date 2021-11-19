@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  div
+    form(action='/group',method='post')
+      div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='name') Nama 
+             input(id='name',type='text',value='',name='name')
+      div#passworddiv(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='desc') Deskripsi
+             input(id='desc',type='text',value='',name='desc')
+      div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='grup') Kode Grup
+             input(id='grup',type='text',value='',name='code')
+      div(data-role='fieldcontain')   
+        input(type='submit',value='Buat Group',data-transition='fade', data-theme='c')
+  br
+  br  
+  
+  div
+      if groups
+        each group in groups
+          form(action="/group/delete", method='post')
+            h1 #{group.nama} - #{group.deskripsi} - #{group.code}
+            span  iframe src="http://localhost:7000/wa/form/#{group.id}" 
+            br
+            br
+            input(type='submit',value='Hapus Group',data-transition='fade', data-theme='c')
+            input(type='hidden',value='#{group.id}',name='_id')
+            input(type='hidden',value='#{group.id}',name='_rev')
+            br
+            br

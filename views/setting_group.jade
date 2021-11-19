@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  div
+    form(action='/group/sub',method='post')
+      div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='group') Pilih Group
+             select(id="xxx", name="groups")
+                -for(var i = 0;i<groups.length;i++){
+                  option(value="#{groups[i]['id']}") #{groups[i]['nama']}
+                -}
+      div#passworddiv(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='kontak') Auto Keluar Dari Group
+             select(id="xxx", name="sub_group")
+                -for(var i = 0;i<groups.length;i++){
+                  option(value="#{groups[i]['id']}") #{groups[i]['nama']}
+                -}
+      div(data-role='fieldcontain')   
+        input(type='submit',value='Submit',data-transition='fade', data-theme='c')
+
+    if setting_group
+      h1 #{setting_group.nama}
+        

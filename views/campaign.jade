@@ -1,0 +1,48 @@
+extends layout
+
+block content
+  div
+    form(action='/campaign',method='post')
+      div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='group') Pilih Groups
+             select(id="xxx", name="groups")
+                -for(var i = 0;i<groups.length;i++){
+                  option(value="#{groups[i]['id']}") #{groups[i]['nama']}
+                -}
+      div#passworddiv(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='Hari') Hari
+             select(id="xxx", name="type")
+                option(value="days") Hari
+                option(value="hour") Jam
+                option(value="minutes") Menit
+      div(data-role='fieldcontain') 
+        fieldset(data-role='controlgroup')
+          label(for='value') Nilai
+             input(id='value',type='text',value='',name='value')
+      div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='message') Pesan
+             input(id='messages',type='text',value='',name='messages')
+      div(data-role='fieldcontain')   
+        input(type='submit',value='Buat Campaign',data-transition='fade', data-theme='c')
+  div
+      br
+      br
+      if campaigns
+        each campaign in campaigns
+          form(action="/campaign/delete", method='post')
+            h1 #{campaign.nama} 
+            input(type='hidden',value='#{campaign.k_id}',name='_id')
+            input(type='hidden',value='#{campaign.k_id}',name='_rev')
+            p Pesan #{campaign['pesan']}
+            p  #{campaign['nilai']} - #{campaign['tipe']}
+            a(href="/campaign/content/delete/#{campaign.k_id}") Hapus
+            br
+            br
+            input(type='submit',value='Hapus Kampanye',data-transition='fade', data-theme='c')
+            br
+            br
+
+

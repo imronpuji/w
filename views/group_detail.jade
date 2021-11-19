@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  div
+    form(action='/groups/detail',method='post')
+      div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='group') Pilih Groups
+             select(id="xxx", name="groups")
+                -for(var i = 0;i<groups.length;i++){
+                  option(value="#{groups[i]['id']}") #{groups[i]['nama']}
+                -}
+      div#passworddiv(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='kontak') Kontak
+             select(id="xxx", name="contacts")
+                -for(var i = 0;i<contacts.length;i++){
+                  option(value="#{contacts[i]['id']}") #{contacts[i]['nama']}
+                -}
+      div(data-role='fieldcontain')   
+        input(type='submit',value='Masukan Ke Group',data-transition='fade', data-theme='c')
+
+  div
+    br
+    br
+    if groups_detail
+      each detail in groups_detail
+        form(action="/group_detail/delete", method='post')
+          h1 #{detail.nama_grup} 
+          input(type='hidden',value='#{detail.id}',name='_id')
+          input(type='hidden',value='#{detail.id}',name='_rev') 
+          h3 #{detail['nama']} - #{detail['nomor']} - #{detail['status']} 
+          a(href="/group_detail/contact/#{detail.g_d_id}") Hapus
+          br
+          br
+          input(type='submit',value='Hapus Isi Group',data-transition='fade', data-theme='c')
+
+            

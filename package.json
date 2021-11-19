@@ -1,0 +1,33 @@
+{
+  "name": "wa-services",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "@adiwajshing/baileys": "^3.5.3",
+    "@open-wa/wa-automate": "^4.23.9",
+    "axios": "^0.24.0",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "fs": "^0.0.1-security",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "moment": "^2.29.1",
+    "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
+    "node-cron": "^3.0.0",
+    "node-fetch": "^3.1.0",
+    "path": "^0.12.7",
+    "pouchdb": "^7.2.2",
+    "pouchdb-find": "^7.2.2",
+    "pouchdb-upsert": "^2.2.0",
+    "qrcode": "^1.4.4",
+    "qrcode-terminal": "^0.12.0",
+    "request": "^2.88.2",
+    "whatsapp-web.js": "^1.15.1"
+  }
+}
