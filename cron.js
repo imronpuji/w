@@ -17,7 +17,7 @@ async function job(){
 									let dateNow = new Date().toLocaleTimeString([], time)
 							    	console.log(vals.nomor)
 							    	if(dateNow == userDateForChecking){
-							  			await axios.post('http://localhost:7000/wa/send-bulk', {contact:vals.nomor, message:val['pesan']}).then(results => {}).catch(err => err)
+							  			await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:vals.nomor, message:val['pesan']}).then(results => {}).catch(err => err)
 							  		}
 							    })
 							}
@@ -34,7 +34,7 @@ async function job(){
 									let dateNow = new Date().toLocaleTimeString([], time)
 							    	console.log(vals.nomor)
 							    	if(dateNow == userDateForChecking){
-							  			await axios.post('http://localhost:7000/wa/send-bulk', {contact:vals.nomor, message:val['pesan']}).then(results => {}).catch(err => err)
+							  			await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:vals.nomor, message:val['pesan']}).then(results => {}).catch(err => err)
 							  		}
 							    })
 							}
@@ -51,7 +51,7 @@ async function job(){
 									let dateNow = new Date().toLocaleTimeString([], time)
 							    	console.log(vals.nomor)
 							    	if(dateNow == userDateForChecking){
-							  			await axios.post('http://localhost:7000/wa/send-bulk', {contact:vals.nomor, message:val['pesan']}).then(results => {}).catch(err => err)
+							  			await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:vals.nomor, message:val['pesan']}).then(results => {}).catch(err => err)
 							  		}
 							    })
 							}
