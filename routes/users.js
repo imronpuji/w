@@ -37,8 +37,26 @@ router.get('/form/:group_id', (req, res) => {
 async function run () {
     const conn = new WAConnection() 
 
-    // called when WA sends chats
-    // this can take up to a few minutes if you have thousands of chats!
+
+    conn.connectOptions = {
+	    /** fails the connection if no data is received for X seconds */
+	    maxIdleTimeMs?: 60_000,
+	    /** maximum attempts to connect */
+	    maxRetries?: 10,
+	    /** max time for the phone to respond to a connectivity test */
+	    phoneResponseTime?: 15_000,
+	    /** minimum time between new connections */
+	    connectCooldownMs?: 4000,
+	    /** agent used for WS connections (could be a proxy agent) */
+	    agent?: Agent = undefined,
+	    /** agent used for fetch requests -- uploading/downloading media */
+	    fetchAgent?: Agent = undefined,
+	    /** always uses takeover for connecting */
+	    alwaysUseTakeover: true
+	    /** log QR to terminal */
+	    logQR: true
+	} as WAConnectOptions
+
     await conn.on('chats-received', async ({ hasNewChats }) => {
         console.log(`you have ${conn.chats.length} chats, new chats available: ${hasNewChats}`)
 
