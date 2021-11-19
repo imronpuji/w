@@ -40,22 +40,22 @@ async function run () {
 
     conn.connectOptions = {
 	    /** fails the connection if no data is received for X seconds */
-	    maxIdleTimeMs?: 60_000,
+	    maxIdleTimeMs: 60_000,
 	    /** maximum attempts to connect */
-	    maxRetries?: 10,
+	    maxRetries: 10,
 	    /** max time for the phone to respond to a connectivity test */
-	    phoneResponseTime?: 15_000,
+	    phoneResponseTime: 15_000,
 	    /** minimum time between new connections */
-	    connectCooldownMs?: 4000,
+	    connectCooldownMs: 4000,
 	    /** agent used for WS connections (could be a proxy agent) */
-	    agent?: Agent = undefined,
+	    agent: Agent = undefined,
 	    /** agent used for fetch requests -- uploading/downloading media */
-	    fetchAgent?: Agent = undefined,
+	    fetchAgent: Agent = undefined,
 	    /** always uses takeover for connecting */
-	    alwaysUseTakeover: true
+	    alwaysUseTakeover: true,
 	    /** log QR to terminal */
 	    logQR: true
-	} as WAConnectOptions
+	}
 
     await conn.on('chats-received', async ({ hasNewChats }) => {
         console.log(`you have ${conn.chats.length} chats, new chats available: ${hasNewChats}`)
