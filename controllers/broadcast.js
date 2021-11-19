@@ -5,7 +5,7 @@ const axios = require('axios')
 PouchDB.plugin(Plugin)
 
 const {connection} = require('../conn')
-const postBroadcast = async ({groups, messages},cb) => {
+const postBroadcast = async ({groups, messages, url},cb) => {
 	
 	// await dbs.get(groups).then(async res => {
 	// 	if(res.contact != []){
@@ -25,8 +25,10 @@ const postBroadcast = async ({groups, messages},cb) => {
 		`, function (error, results, fields) {
 		  	if (error) throw error;
 		  	results.filter(async(vals) => {
-		    	console.log(vals)
-		  		await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:vals.nomor, message:messages}).then(results => {}).catch(err => err)
+		  		let message = `${vals.sapaan} ${vals.nama} 
+		  		${messages}
+		  		`
+		  		await axios.post(`http://${url}/wa/send-bulk`, {contact:vals.nomor, message}).then(results => {}).catch(err => err)
 		    })
 		  	cb(results)
 	});

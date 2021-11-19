@@ -25,8 +25,9 @@ block content
         each group in groups
           form(action="/group/delete", method='post')
             h1 #{group.nama} - #{group.deskripsi} - #{group.code}
-            span  iframe src="http://localhost:7000/wa/form/#{group.id}" 
+            span  iframe src="#{url}/wa/form/#{group.id}" 
             br
+            a(href="/setting/group/#{group.id}") Setting Grup
             br
             input(type='submit',value='Hapus Group',data-transition='fade', data-theme='c')
             input(type='hidden',value='#{group.id}',name='_id')

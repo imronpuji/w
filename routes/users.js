@@ -21,7 +21,7 @@ router.get('/qr', (req, res) => {
 })
 
 router.get('/form/:group_id', (req, res) => {
-    return res.send(`<form method="post" action="http://192.168.1.6:7000/kontak/group">
+    return res.send(`<form method="post" action="http://localhost:7000/kontak/group">
     		<input placehoder="username" name="username"/>
     		<input type="hidden" name="group" value="${req.params.group_id}"/>
     		<input placehoder="Nomor Wa" name="wa_number"/>
@@ -40,7 +40,7 @@ async function run () {
 
     conn.connectOptions = {
 	    /** fails the connection if no data is received for X seconds */
-	    maxIdleTimeMs: 60_000,
+	    maxIdleTimeMs: 999999,
 	    /** maximum attempts to connect */
 	    maxRetries: 10,
 	    /** max time for the phone to respond to a connectivity test */
@@ -114,7 +114,7 @@ async function run () {
         } else console.log (chatUpdate) // see updates (can be archived, pinned etc.)
     })
     router.get('/send', async (req, res) => {
-    	const sentMsg  = await conn.sendMessage ('6285846224389@s.whatsapp.net', 'oh hello there', MessageType.text)
+    	const sentMsg  = await conn.sendMessage('6285846224389@s.whatsapp.net', 'oh hello there', MessageType.text)
     	await res.send('terkirim')
 	})
 

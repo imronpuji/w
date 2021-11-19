@@ -4,7 +4,7 @@ var {postContact, getContact, removeContact} = require('../controllers/contact')
 var {postBroadcast} = require('../controllers/broadcast')
 var {postProfile, putProfile, getProfile} = require('../controllers/setting')
 var {postCampaign, getCampaign, removeCampaign,removeContentOfCampaign} = require('../controllers/campaign')
-var {postGroup, getGroupByCode, putSubGroup, removeContactInGroupDetail, getGroupById, getGroup, getGroupsDetails, postGroupsDetails, getDetailsGroup, removeGroup, removeGroupDetail} = require('../controllers/group')
+var {postGroup, getGroupByCode, removeSettingGroupById, putSubGroup, getGroupsDetailsById,getSettingGroupById, removeContactInGroupDetail, getGroupById, getGroup, getGroupsDetails, postGroupsDetails, getDetailsGroup, removeGroup, removeGroupDetail} = require('../controllers/group')
 
 
 /* GET home page. */
@@ -15,14 +15,25 @@ router.get('/', function(req, res, next) {
 // contacts
 router.get('/kontak', ({body}, res, next) => getContact(async (result) => await res.render('contact', {contacts:result})))
 router.post('/kontak', async (req, res, next) => await postContact(req.body, async (val) =>  res.redirect('/kontak')))
-router.post('/kontak/group', async (req, res, next) => await postContact(req.body, async (val) =>  {
-	await postGroupsDetails({groups:req.body.group, contacts:req.body.wa_number}, async (val)=> {
-		await getGroupById(req.body.group, (result) => {
-			if(result.sub_group && result.sub_group.length > 0){
-				result.sub_group.filter(val => {
-					removeContactInGroupDetail({groups:val._id, contacts:req.body.wa_number}, async ()=> console.log('berhasil'))
-				})
-			}
+router.post('/kontak/group', async (req, res, next) => await postContact(req.body, async (valContact) =>  {
+	await postGroupsDetails({groups:req.body.group, contacts:valContact.insertId}, async (val)=> {
+		await getSettingGroupById(req.body.group, async (result) => {
+			await result.filter(async val => {
+				if(val.grup_id != undefined){
+					await getGroupsDetailsById(val.grup_out_id, (result)=>{
+						result.filter(val => {
+							 if(val.nomor == req.body.wa_number){
+							 	removeContactInGroupDetail({groups:val.g_d_id}, (res) => {
+							 		return res
+							 	})
+							 	removeContact({id:val.kontak_id}, (res) => {
+							 		return res
+							 	})
+							 }
+						})
+					})
+				}
+			})
 		})
 	})
 	
@@ -31,7 +42,7 @@ router.post('/kontak/group', async (req, res, next) => await postContact(req.bod
 router.post('/kontak/delete', async (req, res, next) => await removeContact(req.body, async (val) =>  res.redirect('/kontak')))
 
 // groups
-router.get('/group', ({body}, res, next) => getGroup(async (result) => await res.render('group', {groups:result})))
+router.get('/group', (req, res, next) => getGroup(async (result) => await res.render('group', {groups:result, url:req.headers.host})))
 router.post('/group', async (req, res, next) => await postGroup(req.body, async (val) =>  res.redirect('/group')))
 router.post('/group/delete', async (req, res, next) => await removeGroup(req.body, async (val) =>  res.redirect('/group')))
 
@@ -67,7 +78,7 @@ router.get('/broadcast', ({body}, res, next) => getGroupsDetails(async (result) 
 		await res.render('broadcast', {groups:result})
 	})
 }))
-router.post('/broadcast', ({body}, res, next) => postBroadcast(body, (result) => res.redirect('/broadcast')))
+router.post('/broadcast', (req, res, next) => postBroadcast({groups:req.body.groups, messages:req.body.messages, url:req.headers.host}, (result) => res.redirect('/broadcast')))
 
 // owner
 
@@ -76,13 +87,13 @@ router.post('/setting', (req, res, next) => postProfile(req.body, ()=>res.redire
 router.post('/setting/edit', (req, res, next) => putProfile(1, req.body, ()=>res.redirect('/setting')))
 
 // setting group
-router.get('/setting/group', async ({body}, res, next) => getGroup(async (result, val) => {
-	await getDetailsGroup(async (resGroupsDetail) => {
-		console.log(resGroupsDetail)
- 		await res.render('setting_group', {groups:result, setting_group:resGroupsDetail})
-
+router.get('/setting/group/:group_id', async (req, res, next) => getGroup(async (result, val) => {
+	getGroupById(req.params.group_id, (resultGroupId) => {
+		getSettingGroupById(resultGroupId[0].id, (resGroupsDetail) => res.render('setting_group', {setting_groups:resGroupsDetail, groups:result, group:resultGroupId[0]}))
 	})
 }))
+router.get('/setting/group/delete/:setting_group_id/:group_id', (req, res, next) => removeSettingGroupById({setting_group_id:req.params.setting_group_id}, (result) =>  res.redirect(`/setting/group/${req.params.group_id}`)))
+
 router.post('/group/sub', async (req, res, next) => await putSubGroup(req.body, async (val) =>  res.redirect('/setting/group')))
 
 // router untuk testing

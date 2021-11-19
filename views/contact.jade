@@ -29,7 +29,7 @@ block content
         each contact in contacts
           form(action="/kontak/delete", method='post')
             h1 #{contact.nama} - #{contact.alamat} - #{contact.nomor} - #{contact.date} - #{contact.status == true ? 'sudah terverifikasi' : 'tidak aktif'}
-            input(type='hidden',value='#{contact.id}',name='_id')
+            input(type='hidden',value='#{contact.id}',name='id')
             input(type='hidden',value='#{contact.rev}',name='_rev')
 
             input(type='submit',value='Hapus Kontak',data-transition='fade', data-theme='c')
