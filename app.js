@@ -17,7 +17,10 @@ __dirname = path.resolve();
 // coonect
 connect()
 
-usersRouter.run()
+usersRouter.run().catch(async err => {
+  await fs.unlinkSync('./auth_info.json')
+  await usersRouter.run()
+} )
 job()
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

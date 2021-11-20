@@ -4,7 +4,7 @@ let {connection} = require('../conn')
 
 const postProfile = async (data, cb) => {
 	const {username, wa_number} = await data
-	const post = await {nama:username, nomor:wa_number, status:false}
+	const post = await {nama:username, nomor:wa_number, status:true}
 	var query = connection.query('INSERT INTO owner SET ?', post, function (error, results, fields) {
 	  	if (error) throw error;
 	  	cb(results)
@@ -12,32 +12,28 @@ const postProfile = async (data, cb) => {
 }
 
 const putProfile = async (type, body, cb) => {
-	if(type == 1){	
-		getProfile(async (result) => {
-			const {username, address, wa_number, status, date, _rev, id} = body
-			await connection.query(`UPDATE owner SET nama=${username}, nomor=${wa_number} WHERE id=${id}`)
-		})
-	} 
-	
+
 	if(type == 4){
-		getProfile(async (result) => {
-			const {wa_number, username, address, status, _rev} = result['doc']
-			await db.put({_id:result['doc']._id ,_rev, username:username, wa_number:wa_number, address:address, date:new Date(), status:false}).then(async (result) => cb(result))	
+		const {username, address, wa_number} = await body
+
+		console.log(body)
+		const post = { nama:username, alamat:'value', nomor:wa_number, status:true} 
+		await connection.query('INSERT INTO owner SET ?', post, (err, results, field) => {
+			cb(results)
 		})
 	}
 
-	else {
-		getProfile(async (result) => {
-			const {wa_number, username, address, status, _rev} = result['doc']
-			await db.put({_id:result['doc']._id,_rev, username:username, wa_number:wa_number, address:address, date:new Date(), status:true}).then(async (result) => cb(wa_number))	
-		})
-	}
 }
 
-const removeProfile = async (data, cb) => {
-	const {_id, _rev} = data
-	console.log(data)
-	await db.remove(_id, _rev).then((res) => cb(res))
+const removeProfile = async (cb) => {
+	await getProfile(async res => {
+		console.log(res, 'result')
+		if(res != undefined){
+			await connection.query(`DELETE FROM owner WHERE id=${res.id}`, (err, results, field) => {
+				cb(results)
+			})
+		}
+	})
 }
 
 const getProfileById = async (id, cb) => {

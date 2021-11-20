@@ -6,10 +6,11 @@ var {verifyContact, checkIfContactExist, postContact} = require('../controllers/
 var {getGroupByCode, postGroupsDetails, removeContactInGroupDetail} = require('../controllers/group')
 var fs = require('fs')
 var qrcode = require('qrcode')
+var axios = require('axios')
 var { WAConnection, MessageType } = require('@adiwajshing/baileys')
 __dirname = path.resolve();
 
-const {getProfile, putProfile} = require('../controllers/setting')
+const {getProfile, putProfile, postProfile, removeProfile} = require('../controllers/setting')
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
@@ -39,12 +40,12 @@ async function run () {
 
 
 
-   await conn.on ('open', () => {
+   await conn.on ('open', async () => {
 	    // save credentials whenever updated
 	    console.log (`credentials updated!`)
-	    const authInfo = conn.base64EncodedAuthInfo() // get all the auth info we need to restore this session
-	    fs.writeFileSync('./auth_info.json', JSON.stringify(authInfo, null, '\t'))
-
+	    const authInfo = await conn.base64EncodedAuthInfo() // get all the auth info we need to restore this session
+	    await fs.writeFileSync('./auth_info.json', JSON.stringify(authInfo, null, '\t'))
+	   
 	})
    	
    	if (fs.existsSync('./auth_info.json')) {
@@ -75,6 +76,20 @@ async function run () {
 	})
 
     await conn.connect ()
+    let user = await conn.user
+    await postProfile({wa_number:user.jid, username:user.name, address:'null', status:true}, async (result) => {
+	    	await console.log(result)
+	 })
+
+    conn.on('close', async ()=> {
+    	if (fs.existsSync('./auth_info.json')) {
+    		await fs.unlinkSync('./auth_info.json')
+		}
+    	await removeProfile(async(res)=> {
+    		axios.get('https://wa.trenbisnis.net/start')
+    	})
+    })
+
     conn.on('chat-update', chatUpdate => {
         // `chatUpdate` is a partial object, containing the updated properties of the chat
         // received a new message
