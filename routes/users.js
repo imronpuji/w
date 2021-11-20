@@ -2,7 +2,7 @@ var express = require('express');
 var path = require('path')
 var router = express.Router();
 var {run_wa} = require('../app')
-var {verifyContact} = require('../controllers/contact')
+var {verifyContact, checkIfContactExist, postContact} = require('../controllers/contact')
 var {getGroupByCode, postGroupsDetails, removeContactInGroupDetail} = require('../controllers/group')
 var fs = require('fs')
 var qrcode = require('qrcode')
@@ -38,23 +38,17 @@ async function run () {
     const conn = new WAConnection() 
 
 
-    conn.connectOptions = {
-	    /** fails the connection if no data is received for X seconds */
-	    maxIdleTimeMs: 999999,
-	    /** maximum attempts to connect */
-	    maxRetries: 10,
-	    /** max time for the phone to respond to a connectivity test */
-	    phoneResponseTime: 15_000,
-	    /** minimum time between new connections */
-	    connectCooldownMs: 4000,
-	    /** agent used for WS connections (could be a proxy agent) */
-	    agent: Agent = undefined,
-	    /** agent used for fetch requests -- uploading/downloading media */
-	    fetchAgent: Agent = undefined,
-	    /** always uses takeover for connecting */
-	    alwaysUseTakeover: true,
-	    /** log QR to terminal */
-	    logQR: true
+
+   await conn.on ('open', () => {
+	    // save credentials whenever updated
+	    console.log (`credentials updated!`)
+	    const authInfo = conn.base64EncodedAuthInfo() // get all the auth info we need to restore this session
+	    fs.writeFileSync('./auth_info.json', JSON.stringify(authInfo, null, '\t'))
+
+	})
+   	
+   	if (fs.existsSync('./auth_info.json')) {
+    	await conn.loadAuthInfo ('./auth_info.json') 
 	}
 
     await conn.on('chats-received', async ({ hasNewChats }) => {
@@ -97,15 +91,36 @@ async function run () {
 
 			if(a[0].toLowerCase() == 'daftar' && a[1]){
 				console.log(a[1], 'a1')
-				getGroupByCode(a[1], (result) => {
-					if(result.docs[0] != []){
-						console.log(result, 'result')
-						let contacts = message.message.jid.substr(0, message.message.jid.length - 15);
-						postGroupsDetails({groups:result.docs[0]._id, contacts},(res) => {
-							if(result.docs[0].sub_group && result.docs[0].sub_group.length > 0){
-								result.docs[0].sub_group.filter(val => {
-									removeContactInGroupDetail({groups:val._id, contacts}, async ()=> console.log('berhasil'))
+				getGroupByCode(a[1], async (resultGrup) => {
+					if(resultGrup[0] != []){
+						let contacts = message.key.remoteJid.substr(0, message.key.remoteJid.length - 15);
+						checkIfContactExist(contacts, async (result) => {
+							if(result.length == []){
+								await postContact({wa_number:contacts, address:a[4], username:a[2], called:a[3]}, async (result) => {
+									await postGroupsDetails({groups:resultGrup[0].id, contacts:result.insertId},async (res) => {
+										// await getSettingGroupById(result[0].id, async (result) => {
+										// 	await result.filter(async val => {
+										// 		if(val.grup_id != undefined){
+										// 			await getGroupsDetailsById(val.grup_out_id, (result)=>{
+										// 				result.filter(val => {
+										// 					 if(val.nomor == contacts){
+										// 					 	removeContactInGroupDetail({groups:val.g_d_id}, (res) => {
+										// 					 		return res
+										// 					 	})
+										// 					 	removeContact({id:val.kontak_id}, (res) => {
+										// 					 		return res
+										// 					 	})
+										// 					 }
+										// 				})
+										// 			})
+										// 		}
+										// 	})
+										// })
+										await conn.sendMessage(message.key.remoteJid, `Selamat ${a[3]} ${a[2]} anda sudah Terdaftar di grup ${resultGrup[0]['nama']}`, MessageType.text)
+									})
 								})
+							} else {
+								await conn.sendMessage(message.key.remoteJid, `Maaf ${a[3] == undefined ? '' : a[3]} ${a[2]} anda sudah Terdaftar di grup ${resultGrup[0]['nama']}`, MessageType.text)
 							}
 						})
 					}

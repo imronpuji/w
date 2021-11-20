@@ -99,7 +99,7 @@ const getGroupsDetailsById = async (id,cb) => {
 
 const postGroupsDetails = async ({groups, contacts}, cb) => {
 	console.log(groups, contacts)
-	let post = {kontak_id:contacts, grup_id:groups, date:new Date()}
+	let post = {kontak_id:contacts, grup_id:`${groups}`, date:new Date()}
 	var query = connection.query('INSERT INTO grup_details SET ?', post, function (error, results, fields) {
 	  	if (error) throw error;
 	  	console.log(results)
@@ -131,11 +131,11 @@ const getDetailsGroupById = async (id, cb) => {
 
 const getGroupByCode = async (code, cb) => {
 
-	db.find({
-        selector: {code: code},
-    }).then(async (result) => { 	
-		cb(result)   	
-    })
+	var query = connection.query(`SELECT * FROM grups WHERE code ='${code}'`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	console.log(results)
+	  	cb(results)
+	});
 }
 
 const removeContactInGroupDetail = async ({groups}, cb) => {

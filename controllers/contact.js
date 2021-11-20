@@ -24,6 +24,14 @@ const postContact = async (data, cb) => {
 	}
 }
 
+const checkIfContactExist = (nomor, cb) => {
+	var query = connection.query(`SELECT * FROM kontaks WHERE nomor = "${nomor}"`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	console.log(results)
+	  	cb(results)
+	});
+}
+
 const putContact = () => {
 	
 }
@@ -71,6 +79,6 @@ const verifyContact=async(_id, cb)=>{
 	})
 }
 
-module.exports = {postContact, getContact, getContactById, removeContact, verifyContact};
+module.exports = {postContact, getContact, getContactById, removeContact, verifyContact, checkIfContactExist};
 
 

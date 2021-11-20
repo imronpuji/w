@@ -14,8 +14,8 @@ const postProfile = async (data, cb) => {
 const putProfile = async (type, body, cb) => {
 	if(type == 1){	
 		getProfile(async (result) => {
-			const {username, address, wa_number, status, date, _rev} = body
-			await db.put({_id:result['doc']._id, _rev, username:username, wa_number:wa_number, address:address, date, status}).then(async (result) => cb(result))	
+			const {username, address, wa_number, status, date, _rev, id} = body
+			await connection.query(`UPDATE owner SET nama=${username}, nomor=${wa_number} WHERE id=${id}`)
 		})
 	} 
 	

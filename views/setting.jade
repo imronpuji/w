@@ -3,9 +3,9 @@ extends layout
 block content
   div
     if owner != null
-      if owner.status == true
+      if owner.status == 1
         h1 Aktif
-      if owner.status == false
+      if owner.status == 0
         h1 Off
     if owner == null
       form(action='/setting',method='post')
@@ -34,6 +34,7 @@ block content
           fieldset(data-role='controlgroup')
             label(for='wa_number') Nomor WA
                input(id='wa_number',type='text',value='#{owner.nomor}',name='wa_number')
+               input(id='wa_number',type='hidden',value='#{owner.id}',name='id')
         div(data-role='fieldcontain')   
           input(type='submit',value='Ubah',data-transition='fade', data-theme='c')
       br
@@ -43,7 +44,7 @@ block content
       h1  Barcode 
       img(src="/wa/qr")
 
-    if owner.status == true
+    if owner.status == 1
       button
         a(href="/wa/logout") Keluar
     br
