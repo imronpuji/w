@@ -25,7 +25,7 @@ const postBroadcast = async ({groups, messages, url},cb) => {
 		`, function (error, results, fields) {
 		  	if (error) throw error;
 		  	results.filter(async(vals) => {
-		  		let msg = messages.replace('@nama', vals.nama).replace('@sapaan', vals.sapaan)
+		  		let msg = messages.replace(/@nama/g, vals.nama).replace(/@sapaan/g, vals.sapaan)
 		  		
 
 		  		console.log(msg)
