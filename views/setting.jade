@@ -13,12 +13,21 @@ block content
         div(data-role='fieldcontain')
           fieldset(data-role='controlgroup')
             label(for='username') Pemilik
-               input(id='username',type='text',value='#{owner.nama}',name='username')
+               input(id='username',type='text', disabled,value='#{owner.nama}',name='username')
         div#passworddiv(data-role='fieldcontain')
           fieldset(data-role='controlgroup')
             label(for='wa_number') Nomor WA
-               input(id='wa_number',type='text',value='#{owner.nomor}',name='wa_number')
+               input(id='wa_number',type='text', disabled, value='#{owner.nomor}',name='wa_number')
                input(id='wa_number',type='hidden',value='#{owner.id}',name='id')
+        div#passworddiv(data-role='fieldcontain')
+          fieldset(data-role='controlgroup')
+            label(for='subscribe') SUBSCRIBE
+               input(id='subscribe',type='text',value='#{owner.subscribe}',name='subscribe')
+        div#passworddiv(data-role='fieldcontain')
+          fieldset(data-role='controlgroup')
+            label(for='unsubscribe') UNSUBSCRIBE
+               input(id='unsubscribe',type='text',value='#{owner.unsubscribe}',name='unsubscribe')
+        button(type="submit") Setting
 
   if owner == null
       h1  Barcode 

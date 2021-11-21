@@ -88,6 +88,14 @@ const getGroupsDetails = async (cb) => {
 	});
 }
 
+
+const getGroupsDetailWithId = async ({g_id, c_id, }, cb) => {
+	var query = connection.query(`SELECT * FROM grup_details WHERE grup_details.grup_id=${g_id} AND grup_details.kontak_id = ${c_id}`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	cb(results)
+	});
+}
+
 const getGroupsDetailsById = async (id,cb) => {
 	var query = connection.query(`SELECT *,grup_details.date as g_d_date, grups.nama AS nama_grup, grup_details.id as g_d_id, grups.id AS g_id, kontaks.id AS k_id FROM grups INNER JOIN grup_details ON grups.id = grup_id INNER JOIN kontaks ON grup_details.kontak_id = kontaks.id WHERE grups.id = ${id}`, function (error, results, fields) {
 	  	if (error) throw error;
@@ -96,7 +104,13 @@ const getGroupsDetailsById = async (id,cb) => {
 	});
 }
 
-
+const isGroupExist = (id, cb) => {
+	var query = connection.query(`SELECT * FROM grups WHERE grups.id = ${id}`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	console.log(results)
+	  	cb(results)
+	});
+}
 const postGroupsDetails = async ({groups, contacts}, cb) => {
 	console.log(groups, contacts)
 	let post = {kontak_id:contacts, grup_id:`${groups}`, date:new Date()}
@@ -164,7 +178,9 @@ module.exports = {
 				 	getDetailsGroup, 
 				 	getGroupById, 
 				 	getSettingGroupById,
-				 	removeSettingGroupById
+				 	removeSettingGroupById,
+				 	isGroupExist,
+				 	getGroupsDetailWithId
 				 };
 
 

@@ -84,7 +84,7 @@ router.post('/broadcast', (req, res, next) => postBroadcast({groups:req.body.gro
 
 router.get('/setting', (req, res, next) => getProfile((result) =>  res.render('setting', {owner:result})))
 router.post('/setting', (req, res, next) => postProfile(req.body, ()=>res.redirect('/setting')))
-router.post('/setting/edit', (req, res, next) => putProfile(1, req.body, ()=>res.redirect('/setting')))
+router.post('/setting/edit', (req, res, next) => putProfile(4, req.body, ()=>res.redirect('/setting')))
 
 // setting group
 router.get('/setting/group/:group_id', async (req, res, next) => getGroup(async (result, val) => {

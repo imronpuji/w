@@ -1,10 +1,11 @@
 var cron = require('node-cron');
 var {getCampaign} = require('./controllers/campaign')
 var {getGroupsDetailsById} = require('./controllers/group')
+var userRouter = require('./routes/users')
 var axios = require('axios')
 async function job(url){
 	console.log(url)
-    var task = cron.schedule('*/1 * * * *', () =>  {
+    var task = cron.schedule('*/ * * * *', () =>  {    	
     	let time = {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}
 		getCampaign((resCamp)=> {
 			resCamp.filter(val => {		
