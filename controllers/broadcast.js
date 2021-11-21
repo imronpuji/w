@@ -29,7 +29,7 @@ const postBroadcast = async ({groups, messages, url},cb) => {
 		  		
 
 		  		console.log(msg)
-		  		await axios.post(`http://${url}/wa/send-bulk`, {contact:vals.nomor, message: `${msg}`}).then(results => {}).catch(err => err)
+		  		await axios.post(`https://${url}/wa/send-bulk`, {contact:vals.nomor, message: `${msg}`}).then(results => {}).catch(err => err)
 		    })
 		  	cb(results)
 	});
