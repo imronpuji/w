@@ -5,11 +5,12 @@ block content
     form(action='/broadcast',method='post')
       div(data-role='fieldcontain')
         fieldset(data-role='controlgroup')
-          label(for='group') Pilih Groups
-             select(id="xxx", name="groups")
-                -for(var i = 0;i<groups.length;i++){
-                  option(value="#{groups[i]['g_id']}") #{groups[i]['nama_grup']}
-                -}
+            -for(var i = 0;i<groups.length;i++){
+              label(for='group') #{groups[i]['nama']}
+                           br
+              br
+              input(type="checkbox", value="#{groups[i]['id']}", name="groups") 
+            -}
       div(data-role='fieldcontain')
         fieldset(data-role='controlgroup')
           label(for='message') Pesan

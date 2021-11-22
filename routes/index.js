@@ -73,12 +73,22 @@ router.get('/campaign/content/delete/:content_id', (req, res, next) => removeCon
 
 // broadcast 
 
-router.get('/broadcast', ({body}, res, next) => getGroupsDetails(async (result) => {
+router.get('/broadcast', ({body}, res, next) => getGroup(async (result) => {
 	getCampaign(async (resCampaign) => {
 		await res.render('broadcast', {groups:result})
 	})
 }))
-router.post('/broadcast', (req, res, next) => postBroadcast({groups:req.body.groups, messages:req.body.messages, url:req.headers.host}, (result) => res.redirect('/broadcast')))
+router.post('/broadcast', async (req, res, next) => {
+	if(Array.isArray(req.body.groups)){
+		await req.body.groups.filter(val => {
+			postBroadcast({groups:val, messages:req.body.messages, url:req.headers.host}, (result) => result)
+		})
+	} else {
+		await postBroadcast({groups:req.body.groups, messages:req.body.messages, url:req.headers.host}, (result) => result)
+	}
+
+	await res.redirect('/broadcast')
+})
 
 // owner
 
