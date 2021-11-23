@@ -2,6 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var fileUpload = require('express-fileupload');
 var logger = require('morgan');
 var cors =  require('cors');
 var {job} = require('./cron')
@@ -24,6 +25,7 @@ usersRouter.run().catch(async err => {
 job()
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+app.use(fileUpload());
 app.set('view engine', 'jade');
 app.use(cors())
 app.use(logger('dev'));

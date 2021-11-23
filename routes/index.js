@@ -8,6 +8,7 @@ var {postGroup, getGroupByCode, removeSettingGroupById, putSubGroup, getGroupsDe
 var axios = require('axios')
 var differenceInMinutes = require('date-fns/differenceInMinutes')
 var {calculateDate} = require('../helper/date')
+var xlsx =require('node-xlsx')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -57,9 +58,30 @@ router.get('/groups/detail', ({body}, res, next) => getGroup(async (result, val)
 			})
 		})
 }))
-router.post('/groups/detail', async (req, res, next) => await postGroupsDetails(req.body, async (val) => {
-	res.redirect('/groups/detail')
-}))
+router.post('/groups/detail', async (req, res, next) => {
+	if(req.files.file != undefined){
+		const workSheetsFromBuffer = await xlsx.parse(req.files.file.data);
+		console.log(workSheetsFromBuffer)
+		const sheet = workSheetsFromBuffer[0].data.filter(val => val.length > 0)
+		console.log(sheet)
+		await sheet.filter(async (val, index) => {
+			if(index != 0){
+				await getGroupByCode(val[1], async (result) => {
+					console.log(val[2], val[3])
+					await postContact({username:val[2], called:val[3], address:val[4], wa_number:val[0]}, async resPostContact => {
+						await postGroupsDetails({contacts:resPostContact.insertId, groups:result[0].id}, async () => {
+							await res.redirect('/groups/detail')
+						})
+					})
+				})
+			}
+		})
+	} else {
+		postGroupsDetails(req.body, (res) => {
+			res.redirect('/groups/detail')
+		})
+	}
+})
 router.post('/group_detail/delete', async (req, res, next) => await removeGroupDetail(req.body, async (val) =>  res.redirect('/groups/detail')))
 router.get('/group_detail/contact/:group_detail_id', async (req, res, next) => await removeContactInGroupDetail({groups:req.params.group_detail_id}, async (val) =>  res.redirect('/groups/detail')))
 

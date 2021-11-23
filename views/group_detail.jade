@@ -2,7 +2,7 @@ extends layout
 
 block content
   div
-    form(action='/groups/detail',method='post')
+    form(action='/groups/detail',method='post', enctype="multipart/form-data")
       div(data-role='fieldcontain')
         fieldset(data-role='controlgroup')
           label(for='group') Pilih Groups
@@ -17,6 +17,10 @@ block content
                 -for(var i = 0;i<contacts.length;i++){
                   option(value="#{contacts[i]['id']}") #{contacts[i]['nama']}
                 -}
+      div#passworddiv(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label(for='kontak') Upload Excel
+            input(type='file', name="file")
       div(data-role='fieldcontain')   
         input(type='submit',value='Masukan Ke Group',data-transition='fade', data-theme='c')
 
