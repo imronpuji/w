@@ -1,13 +1,13 @@
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
-  // host     : 'localhost',
-  // user     : 'trenbisn_imron',
-  // password : 'tahubladak',
-  // database : 'trenbisn_wa'
   host     : 'localhost',
-  user     : 'root',
-  password : '',
-  database : 'wa_services'
+  user     : 'trenbisn_imron',
+  password : 'tahubladak',
+  database : 'trenbisn_wa'
+  // host     : 'localhost',
+  // user     : 'root',
+  // password : '',
+  // database : 'wa_services'
 });
 
 
@@ -21,6 +21,8 @@ const connect = ()=>{
   		console.log('connected as id ' + connection.threadId);
 	});
 }
+
+ 
 
 module.exports = {connect, connection}
 
