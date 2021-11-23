@@ -59,7 +59,7 @@ router.get('/groups/detail', ({body}, res, next) => getGroup(async (result, val)
 		})
 }))
 router.post('/groups/detail', async (req, res, next) => {
-	if(req.files.file != undefined){
+	if(req.files != null){
 		const workSheetsFromBuffer = await xlsx.parse(req.files.file.data);
 		console.log(workSheetsFromBuffer)
 		const sheet = workSheetsFromBuffer[0].data.filter(val => val.length > 0)
@@ -77,7 +77,7 @@ router.post('/groups/detail', async (req, res, next) => {
 			}
 		})
 	} else {
-		postGroupsDetails(req.body, (res) => {
+		postGroupsDetails(req.body, (result) => {
 			res.redirect('/groups/detail')
 		})
 	}
@@ -136,7 +136,7 @@ router.post('/campaign', ({body}, res, next) => {
 								await res.redirect('/campaign')	
 							} else {
 								await res.redirect('/campaign')	
-								
+
 							}
 						})
 					})
