@@ -102,7 +102,7 @@ router.post('/campaign', ({body}, res, next) => {
 											})	
 										}
 
-										if(distanceDays > body.value && && body.value == 'days'){
+										if(distanceDays > body.value && body.value == 'days'){
 											await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
 											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
