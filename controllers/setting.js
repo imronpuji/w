@@ -29,7 +29,7 @@ const removeProfile = async (cb) => {
 	await getProfile(async res => {
 		
 		if(res != undefined){
-			await connection.query(`DELETE FROM owner WHERE id=${res.id}`, (err, results, field) => {
+			await connection.query(`DELETE * FROM owner`, (err, results, field) => {
 				cb(results)
 			})
 		}

@@ -103,11 +103,11 @@ async function run () {
 
     conn.on('close', async ()=> {
 
-    	if (fs.existsSync('./auth_info.json')) {
-    		await fs.unlinkSync('./auth_info.json')
-		}
+  //   	if (fs.existsSync('./auth_info.json')) {
+  //   		await fs.unlinkSync('./auth_info.json')
+		// }
     	await removeProfile(async(res)=> {
-    		axios.get('http://localhost:7000/start')
+    		await axios.get('https://wa.trenbisnis.net/start')
     	})
     })
 
