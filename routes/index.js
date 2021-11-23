@@ -117,19 +117,19 @@ router.post('/campaign', ({body}, res, next) => {
 
 								if((body.value - sort[sort.length - 1]['nilai']) > 0){
 									calculateDate(val.g_d_date,  async (distanceMinute, distanceDays) => {
-										if(distanceMinute > body.value && body.type == 'minutes'){
+										if(distanceMinute > body.value){
 											await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
 											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
 											})	
 										}
 
-										if(distanceDays > body.value && body.type == 'days'){
-											await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
-											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
+										// if(distanceDays > body.value && body.type == 'days'){
+										// 	await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
+										// 	await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
-											})	
-										}
+										// 	})	
+										// }
 									})
 								}
 
