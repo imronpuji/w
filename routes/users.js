@@ -51,7 +51,7 @@ async function run () {
     /** agent used for fetch requests -- uploading/downloading media */
     fetchAgent: Agent = undefined,
     /** always uses takeover for connecting */
-    alwaysUseTakeover: true,
+    alwaysUseTakeover: false,
     /** log QR to terminal */
     logQR: true
 	} 
@@ -61,13 +61,17 @@ async function run () {
 	    // save credentials whenever updated
 	    console.log (`credentials updated!`)
 	    const authInfo = await conn.base64EncodedAuthInfo() // get all the auth info we need to restore this session
-	    await fs.writeFileSync('./auth_info.json', JSON.stringify(authInfo, null, '\t'))
+	    let user = await conn.user
+	    await postProfile({wa_number:user.jid, username:user.name, address:'null', status:true,  subscribe:'daftar', unsubscribe:'stop', session:JSON.stringify(authInfo, null, '\t')}, async (result) => {
+		    await console.log(result)
+		})
 	   
 	})
    	
-   	if (fs.existsSync('./auth_info.json')) {
-    	await conn.loadAuthInfo ('./auth_info.json') 
-	}
+ 	await getProfile(async (result) => {
+ 		
+ 		await conn.loadAuthInfo(JSON.parse(result.session))
+ 	})
 
     await conn.on('chats-received', async ({ hasNewChats }) => {
         console.log(`you have ${conn.chats.length} chats, new chats available: ${hasNewChats}`)
@@ -93,12 +97,9 @@ async function run () {
 	})
 
     await conn.connect ()
-	conn.autoReconnect = ReconnectMode.onConnectionLost
+	// conn.autoReconnect = ReconnectMode.onConnectionLost
 
-    let user = await conn.user
-    await postProfile({wa_number:user.jid, username:user.name, address:'null', status:true,  subscribe:'daftar', unsubscribe:'stop'}, async (result) => {
-	    	await console.log(result)
-	 })
+    
 
     conn.on('close', async ()=> {
 
@@ -187,6 +188,7 @@ async function run () {
 		    return res.send(req.body.contact);
 	}
 		else {
+			console.log('gagal')
 			return res.send('gagal')
 		}
 	})

@@ -3,8 +3,8 @@ const PouchDB =  require('pouchdb')
 let {connection} = require('../conn')
 
 const postProfile = async (data, cb) => {
-	const {username, wa_number, subscribe, unsubscribe} = await data
-	const post = await {nama:username, nomor:wa_number, status:true, subscribe:'daftar', unsubscribe:'stop'}
+	const {username, wa_number, subscribe, unsubscribe, session} = await data
+	const post = await {nama:username, nomor:wa_number, status:true, subscribe:'daftar', unsubscribe:'stop', session}
 	var query = connection.query('INSERT INTO owner SET ?', post, function (error, results, fields) {
 	  	if (error) throw error;
 	  	cb(results)

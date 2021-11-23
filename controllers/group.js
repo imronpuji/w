@@ -110,9 +110,9 @@ const isGroupExist = (id, cb) => {
 	  	cb(results)
 	});
 }
-const postGroupsDetails = async ({groups, contacts}, cb) => {
+const postGroupsDetails = async ({groups, contacts, date}, cb) => {
 	
-	let post = {kontak_id:contacts, grup_id:`${groups}`, date:new Date()}
+	let post = {kontak_id:contacts, grup_id:`${groups}`, date:date != undefined ? date : new Date()}
 	var query = connection.query('INSERT INTO grup_details SET ?', post, function (error, results, fields) {
 	  	if (error) throw error;
 	  	

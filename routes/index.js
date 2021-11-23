@@ -69,7 +69,7 @@ router.post('/groups/detail', async (req, res, next) => {
 				await getGroupByCode(val[1], async (result) => {
 					console.log(val[2], val[3])
 					await postContact({username:val[2], called:val[3], address:val[4], wa_number:val[0]}, async resPostContact => {
-						await postGroupsDetails({contacts:resPostContact.insertId, groups:result[0].id}, async () => {
+						await postGroupsDetails({contacts:resPostContact.insertId, groups:result[0].id, date:new Date(new Date().setMinutes(new Date().getMinutes() + index))}, async () => {
 							await res.redirect('/groups/detail')
 						})
 					})
@@ -161,10 +161,10 @@ router.get('/broadcast', ({body}, res, next) => getGroup(async (result) => {
 router.post('/broadcast', async (req, res, next) => {
 	if(Array.isArray(req.body.groups)){
 		await req.body.groups.filter(val => {
-			postBroadcast({groups:val, messages:req.body.messages, url:req.headers.host}, (result) => result)
+			postBroadcast({groups:val, messages:req.body.messages, url:req.headers.host, second:req.body.second}, (result) => result)
 		})
 	} else {
-		await postBroadcast({groups:req.body.groups, messages:req.body.messages, url:req.headers.host}, (result) => result)
+		await postBroadcast({groups:req.body.groups, messages:req.body.messages, url:req.headers.host, second:req.body.second}, (result) => result)
 	}
 
 	await res.redirect('/broadcast')

@@ -10,11 +10,16 @@ block content
                            br
               br
               input(type="checkbox", value="#{groups[i]['id']}", name="groups") 
+              br
             -}
       div(data-role='fieldcontain')
         fieldset(data-role='controlgroup')
           label(for='message') Pesan
              input(id='messages',type='text',value='',name='messages')
+       div(data-role='fieldcontain')
+        fieldset(data-role='controlgroup')
+          label Detik
+            input(type="text", name="second") 
       div(data-role='fieldcontain')   
         input(type='submit',value='Buat Siaran',data-transition='fade', data-theme='c')
 

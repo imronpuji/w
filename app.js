@@ -18,14 +18,14 @@ __dirname = path.resolve();
 // coonect
 connect()
 
-usersRouter.run().catch(async err => {
-  await fs.unlinkSync('./auth_info.json')
-  await usersRouter.run()
-} )
-job()
+async function runWa(){
+  await usersRouter.run().catch(async err => {
+    console.log('err')
+  } )
+}
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.use(fileUpload());
 app.set('view engine', 'jade');
 app.use(cors())
 app.use(logger('dev'));
@@ -33,6 +33,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
 app.use('/', indexRouter);
 app.use('/wa', usersRouter.router);
 app.use('/start', (req, res, next) => {
@@ -64,6 +65,8 @@ app.use(function(err, req, res, next) {
 
 
 
+runWa()
+job()
 
 
 module.exports = app;
