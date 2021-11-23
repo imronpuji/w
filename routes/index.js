@@ -134,6 +134,9 @@ router.post('/campaign', ({body}, res, next) => {
 								}
 
 								await res.redirect('/campaign')	
+							} else {
+								await res.redirect('/campaign')	
+								
 							}
 						})
 					})
