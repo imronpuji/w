@@ -3,9 +3,11 @@ var router = express.Router();
 var {postContact, getContact, removeContact} = require('../controllers/contact')
 var {postBroadcast} = require('../controllers/broadcast')
 var {postProfile, putProfile, getProfile} = require('../controllers/setting')
-var {postCampaign, getCampaign, removeCampaign,removeContentOfCampaign} = require('../controllers/campaign')
+var {postCampaign, getCampaign,postCampaignDetail, isCampaignExistWithGroup, getCampaignDetailWithContact, removeCampaign,removeContentOfCampaign, isCampaignDetailexist} = require('../controllers/campaign')
 var {postGroup, getGroupByCode, removeSettingGroupById, putSubGroup, getGroupsDetailsById,getSettingGroupById, removeContactInGroupDetail, getGroupById, getGroup, getGroupsDetails, postGroupsDetails, getDetailsGroup, removeGroup, removeGroupDetail} = require('../controllers/group')
-
+var axios = require('axios')
+var differenceInMinutes = require('date-fns/differenceInMinutes')
+var {calculateDate} = require('../helper/date')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -55,7 +57,9 @@ router.get('/groups/detail', ({body}, res, next) => getGroup(async (result, val)
 			})
 		})
 }))
-router.post('/groups/detail', async (req, res, next) => await postGroupsDetails(req.body, async (val) =>  res.redirect('/groups/detail')))
+router.post('/groups/detail', async (req, res, next) => await postGroupsDetails(req.body, async (val) => {
+
+}))
 router.post('/group_detail/delete', async (req, res, next) => await removeGroupDetail(req.body, async (val) =>  res.redirect('/groups/detail')))
 router.get('/group_detail/contact/:group_detail_id', async (req, res, next) => await removeContactInGroupDetail({groups:req.params.group_detail_id}, async (val) =>  res.redirect('/groups/detail')))
 
@@ -66,7 +70,58 @@ router.get('/campaign', ({body}, res, next) => getGroup(async (result) => {
 		await res.render('campaign', {groups:result, campaigns:resCampaign})
 	})
 }))
-router.post('/campaign', ({body}, res, next) => postCampaign(body, (result) => res.redirect('/campaign')))
+router.post('/campaign', ({body}, res, next) => {
+	isCampaignExistWithGroup(body.groups, body.value, body.type, async (isCampaignExist) => {
+		if(isCampaignExist.length == 0){
+			await postCampaign(body, async (resultPostCampaign) => {
+				await getGroupsDetailsById((body.groups), async (resGroupsDetail) => {
+					await resGroupsDetail.filter(async val => {
+						await getCampaignDetailWithContact(val.kontak_id, body.type, async (result) => {
+							if(result.length !=  0){
+								console.log(result, 'resutllllllllllllllll')
+								let sort = await  result.sort((a,b) => (a.nilai > b.nilai) ? 1 : ((b.nilai > a.nilai) ? -1 : 0));
+								await sort.filter( async values => {
+									if(values.nilai == body.value){
+										await res.redirect('/campaign')
+									}
+								})
+
+								if((body.value - sort[sort.length - 1]['nilai']) < 1){
+									await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
+									await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
+										
+									})
+								}
+
+								if((body.value - sort[sort.length - 1]['nilai']) > 0){
+									calculateDate(val.g_d_date,  async (distanceMinute, distanceDays) => {
+										if(distanceMinute > body.value && body.value == 'minutes'){
+											await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
+											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
+												
+											})	
+										}
+
+										if(distanceDays > body.value && && body.value == 'days'){
+											await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
+											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
+												
+											})	
+										}
+									})
+								}
+
+								await res.redirect('/campaign')	
+							}
+						})
+					})
+				})
+			})
+		} else {
+			await res.redirect('/campaign')
+		}
+	})
+})
 router.post('/campaign/delete', ({body}, res, next) => removeCampaign(body, (result) => res.redirect('/campaign')))
 router.get('/campaign/content/delete/:content_id', (req, res, next) => removeContentOfCampaign({campaign:req.params.content_id}, (result) => res.redirect('/campaign')))
 
@@ -109,7 +164,7 @@ router.post('/group/sub', async (req, res, next) => await putSubGroup(req.body, 
 // router untuk testing
 router.get("/daftar/:code", (req, res) => {
 	getGroupByCode(req.params.code, (result) => {
-		console.log(result.docs[0])
+		
 	})
 })
 

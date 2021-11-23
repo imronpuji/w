@@ -16,7 +16,7 @@ const postContact = async (data, cb) => {
 			});
 		})
 	} else {
-		console.log(post)
+		
 		var query = connection.query('INSERT INTO kontaks SET ?', post, function (error, results, fields) {
 		  	if (error) throw error;
 		  	cb(results)
@@ -27,7 +27,6 @@ const postContact = async (data, cb) => {
 const checkIfContactExist = (nomor, cb) => {
 	var query = connection.query(`SELECT * FROM kontaks WHERE nomor = "${nomor}"`, function (error, results, fields) {
 	  	if (error) throw error;
-	  	console.log(results)
 	  	cb(results)
 	});
 }
@@ -38,10 +37,10 @@ const putContact = () => {
 
 const removeContact = async (data, cb) => {
 	const {id, _rev} = data
-	console.log(data)
+	
 	var query = connection.query(`DELETE FROM kontaks WHERE id=${id}`, function (error, results, fields) {
 	  	if (error) throw error;
-	  	console.log(results)
+	  	
 	  	cb(results)
 	});
 }
@@ -55,7 +54,7 @@ const getContactById = async (id, cb) => {
 const getContact = async (cb) => {
 	let query = connection.query('SELECT * FROM kontaks', function (error, results, fields) {
 		  if (error) throw error;
-		  console.log(results)
+		  
 		  cb(results)
 	});
 }
@@ -66,7 +65,7 @@ const sendContactVerify=async (number, cb)=> {
 
 const verifyContact=async(_id, cb)=>{
 	let num = _id.substr(0, _id.length - 5);
-	console.log(num)
+	
 	db.upsert(num, function (doc) {
 		if (!doc.status) {
 	    doc.status = true;
