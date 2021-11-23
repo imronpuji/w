@@ -58,7 +58,7 @@ router.get('/groups/detail', ({body}, res, next) => getGroup(async (result, val)
 		})
 }))
 router.post('/groups/detail', async (req, res, next) => await postGroupsDetails(req.body, async (val) => {
-
+	res.redirect('/groups/detail')
 }))
 router.post('/group_detail/delete', async (req, res, next) => await removeGroupDetail(req.body, async (val) =>  res.redirect('/groups/detail')))
 router.get('/group_detail/contact/:group_detail_id', async (req, res, next) => await removeContactInGroupDetail({groups:req.params.group_detail_id}, async (val) =>  res.redirect('/groups/detail')))
