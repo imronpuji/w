@@ -108,7 +108,7 @@ async function run () {
   //   		await fs.unlinkSync('./auth_info.json')
 		// }
     	await removeProfile(async(res)=> {
-    		axios.get('http://localhost:7000/start')
+    		axios.get('https://wa.trenbisnis.net/start')
     	})
     })
 

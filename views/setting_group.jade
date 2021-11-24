@@ -1,28 +1,31 @@
 extends layout
 
 block content
-  div
-    h1 #{group.nama}
+  div(class="container-fluid")
     form(action='/group/sub',method='post')
-      div(data-role='fieldcontain')
-        fieldset(data-role='controlgroup')
-          label(for='group') Pilih Group
-             select(id="xxx", name="sub_group")
-                -for(var i = 0;i<groups.length;i++){
-                  option(value="#{groups[i]['id']}") #{groups[i]['nama']}
-                -}
-      div(data-role='fieldcontain')
-        fieldset(data-role='controlgroup')
-             input(id='sapaan',type='hidden',value='#{group.id}',name='groups')
-
-      div(data-role='fieldcontain')   
-        input(type='submit',value='Submit',data-transition='fade', data-theme='c')
+      label(for='group') Pilih Group
+         select(id="xxx", name="sub_group")
+            -for(var i = 0;i<groups.length;i++){
+              if groups[i]['id'] != group.id
+                option(value="#{groups[i]['id']}") #{groups[i]['nama']}
+            -}
+              input(id='sapaan',type='hidden',value='#{group.id}',name='groups')
+        button(type='submit', class="btn btn-primary") Submit
     br
     br
-    h1 auto keluar dari grup
+    h5(style="color:rgba(100,100,100,0.8)") unsubscribe dari grup #{group.nama} 
     if setting_groups
-      h1 
-      each set_g in setting_groups
-        h1 #{set_g.nama}
-        a(href="/setting/group/delete/#{set_g.s_g_id}/#{set_g.grup_id}") Hapus
+      table(class="table table-striped table-light table-bordered")
+        thead
+          tr
+            th(scope="col") Nama
+            th(scope="col") Deskripsi
+            th(scope="col") Aksi
+        tbody
+          each set_g in setting_groups
+            tr
+              td #{set_g.nama}
+              td #{set_g.deskripsi}
+              td  
+                a(class="btn btn-primary" href="/setting/group/delete/#{set_g.s_g_id}/#{set_g.grup_id}") Hapus
         

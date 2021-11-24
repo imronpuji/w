@@ -3,7 +3,7 @@ var router = express.Router();
 var {postContact, getContact, removeContact} = require('../controllers/contact')
 var {postBroadcast} = require('../controllers/broadcast')
 var {postProfile, putProfile, getProfile} = require('../controllers/setting')
-var {postCampaign, getCampaign,postCampaignDetail, isCampaignExistWithGroup, getCampaignDetailWithContact, removeCampaign,removeContentOfCampaign, isCampaignDetailexist} = require('../controllers/campaign')
+var {postCampaign, getCampaign,getCampaignByGroupId, postCampaignDetail, isCampaignExistWithGroup, getCampaignDetailWithContact, removeCampaign,removeContentOfCampaign, isCampaignDetailexist} = require('../controllers/campaign')
 var {postGroup, getGroupByCode, removeSettingGroupById, putSubGroup, getGroupsDetailsById,getSettingGroupById, removeContactInGroupDetail, getGroupById, getGroup, getGroupsDetails, postGroupsDetails, getDetailsGroup, removeGroup, removeGroupDetail} = require('../controllers/group')
 var axios = require('axios')
 var differenceInMinutes = require('date-fns/differenceInMinutes')
@@ -36,25 +36,25 @@ router.post('/kontak/group', async (req, res, next) => await postContact(req.bod
 						})
 					})
 				}
-			})
+			}) 
 		})
 	})
 	
 	await res.redirect('/kontak')
 }))
-router.post('/kontak/delete', async (req, res, next) => await removeContact(req.body, async (val) =>  res.redirect('/kontak')))
+router.get('/kontak/delete/:id', async (req, res, next) => await removeContact({id:req.params.id}, async (val) =>  res.redirect('/kontak')))
 
 // groups
 router.get('/group', (req, res, next) => getGroup(async (result) => await res.render('group', {groups:result, url:req.headers.host})))
 router.post('/group', async (req, res, next) => await postGroup(req.body, async (val) =>  res.redirect('/group')))
-router.post('/group/delete', async (req, res, next) => await removeGroup(req.body, async (val) =>  res.redirect('/group')))
+router.get('/group/delete/:id', async (req, res, next) => await removeGroup({id:req.params.id}, async (val) =>  res.redirect('/group')))
 
 
 // group detail
-router.get('/groups/detail', ({body}, res, next) => getGroup(async (result, val) => {
+router.get('/groups/detail/:id', (req, res, next) => getGroupsDetailsById(req.params.id,async (result, val) => {
 		await getContact(async (contacts) => {
-			await getGroupsDetails(async (resGroupsDetail) => {
-		 		await res.render('group_detail', {groups:result, contacts, groups_detail:resGroupsDetail})
+			await getGroupById(req.params.id, async (resGroupsDetail) => {
+		 		await res.render('group_detail', {groups:resGroupsDetail, contacts, groups_detail:result})
 			})
 		})
 }))
@@ -70,7 +70,7 @@ router.post('/groups/detail', async (req, res, next) => {
 					console.log(val[2], val[3])
 					await postContact({username:val[2], called:val[3], address:val[4], wa_number:val[0]}, async resPostContact => {
 						await postGroupsDetails({contacts:resPostContact.insertId, groups:result[0].id, date:new Date(new Date().setMinutes(new Date().getMinutes() + index))}, async () => {
-							await res.redirect('/groups/detail')
+							await res.redirect('back')
 						})
 					})
 				})
@@ -78,17 +78,18 @@ router.post('/groups/detail', async (req, res, next) => {
 		})
 	} else {
 		postGroupsDetails(req.body, (result) => {
-			res.redirect('/groups/detail')
+			res.redirect('back')
 		})
 	}
 })
 router.post('/group_detail/delete', async (req, res, next) => await removeGroupDetail(req.body, async (val) =>  res.redirect('/groups/detail')))
-router.get('/group_detail/contact/:group_detail_id', async (req, res, next) => await removeContactInGroupDetail({groups:req.params.group_detail_id}, async (val) =>  res.redirect('/groups/detail')))
+router.get('/group_detail/contact/:group_detail_id', async (req, res, next) => await removeContactInGroupDetail({groups:req.params.group_detail_id}, async (val) =>  res.redirect('back')))
 
 
 // campaign
-router.get('/campaign', ({body}, res, next) => getGroup(async (result) => {
-	getCampaign(async (resCampaign) => {
+router.get('/campaign/:id', (req, res, next) => getGroupById(req.params.id, async (result) => {
+	console.log(result)
+	getCampaignByGroupId(result[0].id, async (resCampaign) => {
 		await res.render('campaign', {groups:result, campaigns:resCampaign})
 	})
 }))
@@ -104,12 +105,12 @@ router.post('/campaign', ({body}, res, next) => {
 								let sort = await  result.sort((a,b) => (a.nilai > b.nilai) ? 1 : ((b.nilai > a.nilai) ? -1 : 0));
 								await sort.filter( async values => {
 									if(values.nilai == body.value){
-										await res.redirect('/campaign')
+										await res.redirect('back')
 									}
 								})
 
 								if((body.value - parseInt(sort[sort.length - 1]['nilai'])) < 1){
-									await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
+									await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
 									await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 										
 									})
@@ -119,14 +120,14 @@ router.post('/campaign', ({body}, res, next) => {
 									await calculateDate(val.g_d_date,  async (distanceMinute, distanceDays) => {
 										console.log(distanceMinute)
 										if(distanceMinute > body.value && body.type == 'minutes'){
-											await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
+											await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
 											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
 											})	
 										}
 
 										if(distanceDays > body.value && body.type == 'days'){
-											await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
+											await axios.post('http://localhost:7000/wa/send-bulk', {contact:val.nomor, message:body.messages})
 											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
 											})	
@@ -135,7 +136,7 @@ router.post('/campaign', ({body}, res, next) => {
 								}
 
 							} else {
-								await res.redirect('/campaign')	
+								await res.redirect('back')	
 
 							}
 						})
@@ -143,12 +144,12 @@ router.post('/campaign', ({body}, res, next) => {
 				})
 			})
 		} else {
-			await res.redirect('/campaign')
+			await res.redirect('back')
 		}
 	})
 })
 router.post('/campaign/delete', ({body}, res, next) => removeCampaign(body, (result) => res.redirect('/campaign')))
-router.get('/campaign/content/delete/:content_id', (req, res, next) => removeContentOfCampaign({campaign:req.params.content_id}, (result) => res.redirect('/campaign')))
+router.get('/campaign/content/delete/:content_id', (req, res, next) => removeContentOfCampaign({campaign:req.params.content_id}, (result) => res.redirect('back')))
 
 
 // broadcast 
@@ -184,7 +185,7 @@ router.get('/setting/group/:group_id', async (req, res, next) => getGroup(async 
 }))
 router.get('/setting/group/delete/:setting_group_id/:group_id', (req, res, next) => removeSettingGroupById({setting_group_id:req.params.setting_group_id}, (result) =>  res.redirect(`/setting/group/${req.params.group_id}`)))
 
-router.post('/group/sub', async (req, res, next) => await putSubGroup(req.body, async (val) =>  res.redirect('/setting/group')))
+router.post('/group/sub', async (req, res, next) => await putSubGroup(req.body, async (val) =>  res.redirect('back')))
 
 // router untuk testing
 router.get("/daftar/:code", (req, res) => {

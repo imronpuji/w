@@ -25,8 +25,8 @@ const putSubGroup = async ({groups, sub_group}, cb) => {
 }
 
 const removeGroup = async (data, cb) => {
-	const {_id, _rev} = await data
-	var query = await connection.query(`DELETE FROM grups WHERE id=${_id}`, function (error, results, fields) {
+	const {id, _rev} = await data
+	var query = await connection.query(`DELETE FROM grups WHERE id=${id}`, function (error, results, fields) {
 	  	if (error) throw error;
 	  	
 	  	cb(results)

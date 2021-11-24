@@ -3,20 +3,18 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+    link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css", rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1", crossorigin="anonymous")
   body
-  navbar
-   ul
-    li 
-     a(href="/group") group
-    li 
-     a(href="/kontak") kontak
-    li 
-     a(href="/groups/detail") Detail Group
-    li 
-     a(href="/campaign") Kampanye
-    li 
-     a(href="/broadcast") Siaran
-    li 
-     a(href="/setting") Profil
+  navbar(class="navbar navbar-expand-lg navbar-light bg-primary")
+   div(class="collapse navbar-collapse") 
+     ul
+      li(class="nav-item") 
+       a(href="/group", class="nav-link active" aria-current="page") group
+      li(class="nav-item") 
+       a(href="/kontak", class="nav-link active" aria-current="page") kontak
+      li(class="nav-item") 
+       a(href="/broadcast", class="nav-link active" aria-current="page") Siaran
+      li(class="nav-item") 
+       a(href="/setting", class="nav-link active" aria-current="page") Profil
 
   block content

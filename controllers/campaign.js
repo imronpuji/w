@@ -37,6 +37,15 @@ const getCampaign = async (cb) => {
 
 }
 
+const getCampaignByGroupId = async (id, cb) => {
+	var query = connection.query(`SELECT *, grups.id as g_id, kampanyes.id as k_id FROM kampanyes INNER JOIN grups ON grups.id = '${id}' AND kampanyes.grup_id = '${id}'`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	cb(results)
+	});
+
+}
+
+
 const removeContentOfCampaign = async ({campaign}, cb) => {
 	var query = connection.query(`DELETE  FROM kampanyes WHERE kampanyes.id = ${campaign}`, function (error, results, fields) {
 	  	if (error) throw error;
@@ -76,5 +85,5 @@ const getCampaignDetailWithContact = async (kontak_id,type, cb) => {
 }
 
 
-module.exports = {removeContentOfCampaign,isCampaignExistWithGroup, getCampaign, postCampaign,removeCampaign, postCampaignDetail, isCampaignDetailExist, getCampaignDetailWithContact};
+module.exports = {removeContentOfCampaign,isCampaignExistWithGroup, getCampaign, postCampaign,removeCampaign, postCampaignDetail, getCampaignByGroupId, isCampaignDetailExist, getCampaignDetailWithContact};
 
