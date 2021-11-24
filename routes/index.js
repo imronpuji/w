@@ -98,7 +98,7 @@ router.post('/campaign', ({body}, res, next) => {
 			await postCampaign(body, async (resultPostCampaign) => {
 				await getGroupsDetailsById((body.groups), async (resGroupsDetail) => {
 					await resGroupsDetail.filter(async val => {
-						await getCampaignDetailWithContact(val.kontak_id, body.type, async (result) => {
+						await getCampaignDetailWithContact(val.kontak_id,body.type, async (result) => {
 							if(result.length !=  0){
 								console.log(result, 'resutllllllllllllllll')
 								let sort = await  result.sort((a,b) => (a.nilai > b.nilai) ? 1 : ((b.nilai > a.nilai) ? -1 : 0));
@@ -108,32 +108,32 @@ router.post('/campaign', ({body}, res, next) => {
 									}
 								})
 
-								if((body.value - sort[sort.length - 1]['nilai']) < 1){
+								if((body.value - parseInt(sort[sort.length - 1]['nilai'])) < 1){
 									await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
 									await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 										
 									})
 								}
 
-								if((body.value - sort[sort.length - 1]['nilai']) > 0){
-									calculateDate(val.g_d_date,  async (distanceMinute, distanceDays) => {
-										if(distanceMinute > body.value){
+								if((body.value - parseInt(sort[sort.length - 1]['nilai'])) > 0){
+									await calculateDate(val.g_d_date,  async (distanceMinute, distanceDays) => {
+										console.log(distanceMinute)
+										if(distanceMinute > body.value && body.type == 'minutes'){
 											await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
 											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
 											})	
 										}
 
-										// if(distanceDays > body.value && body.type == 'days'){
-										// 	await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
-										// 	await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
+										if(distanceDays > body.value && body.type == 'days'){
+											await axios.post('https://wa.trenbisnis.net/wa/send-bulk', {contact:val.nomor, message:body.messages})
+											await postCampaignDetail({kontak_id:val.kontak_id, campaign_id:resultPostCampaign.insertId}, () => {
 												
-										// 	})	
-										// }
+											})	
+										}
 									})
 								}
 
-								await res.redirect('/campaign')	
 							} else {
 								await res.redirect('/campaign')	
 

@@ -67,8 +67,8 @@ const isCampaignDetailExist = async (kontak_id,campaign_id, cb) => {
 
 
 
-const getCampaignDetailWithContact = async (kontak_id,tipe, cb) => {
-	var query = connection.query(`SELECT * FROM kampanyes_detail INNER JOIN kampanyes ON kampanyes.id = kampanyes_detail.campaign_id WHERE kampanyes_detail.kontak_id='${kontak_id}' AND kampanyes.tipe='${tipe}'`, async function (error, results, fields) {
+const getCampaignDetailWithContact = async (kontak_id,type, cb) => {
+	var query = connection.query(`SELECT * FROM kampanyes_detail INNER JOIN kampanyes ON kampanyes.id = kampanyes_detail.campaign_id WHERE kampanyes_detail.kontak_id='${kontak_id}' AND kampanyes.tipe = '${type}'`, async function (error, results, fields) {
 	  	if (error) throw error;
 	  	
 	  	await cb(results)

@@ -69,8 +69,9 @@ async function run () {
 	})
    	
  	await getProfile(async (result) => {
- 		
- 		await conn.loadAuthInfo(JSON.parse(result.session))
+ 		if(result != null){
+ 			await conn.loadAuthInfo(JSON.parse(result.session))
+ 		}
  	})
 
     await conn.on('chats-received', async ({ hasNewChats }) => {
@@ -107,7 +108,7 @@ async function run () {
   //   		await fs.unlinkSync('./auth_info.json')
 		// }
     	await removeProfile(async(res)=> {
-    		await axios.get('https://wa.trenbisnis.net/start')
+    		axios.get('http://localhost:7000/start')
     	})
     })
 

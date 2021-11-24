@@ -1,5 +1,5 @@
 var differenceInMinutes = require('date-fns/differenceInMinutes')
-var differenceInBusinessDays = require('date-fns/differenceInBusinessDays')
+var differenceInDays = require('date-fns/differenceInDays')
 
 const calculateDate = (val, cb) => {
 	let time = {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second:'2-digit'}
@@ -18,7 +18,7 @@ const calculateDate = (val, cb) => {
 	valueReg.filter(val => resReg.push(parseInt(val)))
 
 
-	let a = [resReg[2], resReg[0], resReg[1], 7, resReg[4], resReg[5]]
+	let a = [resReg[2], resReg[0], resReg[1], resReg[3], resReg[4], resReg[5]]
 	let b = [res[2], res[0], res[1], res[3], res[4], res[5]]
 
 	var sinceMinuteRegister = differenceInMinutes(
@@ -26,12 +26,12 @@ const calculateDate = (val, cb) => {
 	  	new Date(...a)
 	)
 
-	var sinceDayRegister = differenceInBusinessDays(
-	  	new Date(resReg[2], resReg[0], resReg[1]),
-	  	new Date(res[2], res[0], res[1])
+	const differenceInDay = differenceInDays(
+	  	new Date(res[2], res[0], res[1], res[3], res[4]),
+	  	new Date(resReg[2], resReg[0], resReg[1], resReg[3], resReg[4])
 	)
 
-	cb(sinceMinuteRegister, sinceDayRegister)
+	cb(sinceMinuteRegister, differenceInDay)
 }
 
 module.exports = {calculateDate}
