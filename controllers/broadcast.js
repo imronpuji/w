@@ -10,7 +10,7 @@ const postBroadcast = async ({groups, messages, url, second},cb) => {
 	  				await setTimeout(async function() {   
 		  				let msg = messages.replace(/@nama/g, results[i].nama).replace(/@sapaan/g, results[i].sapaan)
 		  				console.log('heloooooooooooooooooooooooooooooooo')
-		  				await axios.post(`https://${url}/wa/send-bulk`, {contact:results[i].nomor, message: `${msg}`}).then(results => {}).catch(err => err)
+		  				await axios.post(`http://${url}/wa/send-bulk`, {contact:results[i].nomor, message: `${msg}`}).then(results => {}).catch(err => err)
 						i++;                    
 						if (i < results.length) {           
 						    await myLoop();             

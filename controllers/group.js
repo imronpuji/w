@@ -2,7 +2,7 @@ const PouchDB =  require('pouchdb')
 const Plugin =  require('pouchdb-find')
 
 PouchDB.plugin(Plugin)
-const {getContact, getContactById} = require('../controllers/contact')
+const {getContact, getContactById, removeContactByGroupId} = require('../controllers/contact')
 let {connection} = require('../conn')
 
 const postGroup = async (data, cb) => {
@@ -138,25 +138,38 @@ const removeContactInGroupDetail = async ({groups}, cb) => {
 	});
 }
 
+const editGroupById = async (data, cb) => {
 
+	const {name, desc, code, id} = await data
+
+	const post = await {nama:name, deskripsi:desc, code}
+
+	var query = await connection.query(`UPDATE grups SET nama='${name}', deskripsi='${desc}', code='${code}'  WHERE id=${id}`,  function (error, results, fields) {
+	  	if (error) throw error;
+	  	
+	  	cb(results)
+	})
+
+}
 
 
 module.exports = {
-					postGroup,
-				 	getGroupsDetailsById,
-				 	removeGroup, 
-				 	getGroupByCode, 
-				 	putSubGroup, 
-				 	removeContactInGroupDetail,
-				 	removeGroupDetail, 
-				 	getGroup, 
-				 	getGroupsDetails, 
-				 	postGroupsDetails, 
-				 	getGroupById, 
-				 	getSettingGroupById,
-				 	removeSettingGroupById,
-				 	isGroupExist,
-				 	getGroupsDetailWithId
-				 };
+	postGroup,
+	getGroupsDetailsById,
+	removeGroup, 
+	getGroupByCode, 
+	putSubGroup, 
+	removeContactInGroupDetail,
+	removeGroupDetail, 
+	getGroup, 
+	getGroupsDetails, 
+	postGroupsDetails, 
+	getGroupById, 
+	getSettingGroupById,
+	removeSettingGroupById,
+	isGroupExist,
+	getGroupsDetailWithId,
+	editGroupById
+};
 
 

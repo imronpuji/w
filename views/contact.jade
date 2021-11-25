@@ -2,7 +2,7 @@ extends layout
 
 block content
   div(class="container-fluid")
-    form(action='/kontak',method='post')
+    form(action='/kontak',method='post',  enctype="multipart/form-data")
       label(for='username') Nama
          input(id='username',type='text',value='',name='username')
       label(for='sapaan') Sapaan
@@ -10,9 +10,16 @@ block content
       label(for='wa_number') Nomor WA
          input(id='wa_number',type='text',value='',name='wa_number')
       label(for='address') Alamat
-         input(id='address',type='text',value='',name='address')   
-        button(type='submit', class="btn btn-primary") Submit
-
+         input(id='address',type='text',value='',name='address')  
+      label(for='group') Pilih Group
+        select(id="xxx", name="groups")
+          -for(var i = 0;i<groups.length;i++){
+              option(value="#{groups[i]['id']}") #{groups[i]['nama']}
+          -} 
+      label(for='file') Upload Excel
+         input(id='file',type='file',value='',name='file')
+      button(type='submit', class="btn btn-primary") Submit
+  br
   div(class="container-fluid")
     if contacts
       table(class="table table-striped table-light table-bordered")

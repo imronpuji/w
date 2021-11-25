@@ -1,10 +1,13 @@
 const PouchDB =  require('pouchdb')
 
 let {connection} = require('../conn')
+const uuidAPIKey = require('uuid-apikey');
 
 const postProfile = async (data, cb) => {
+	let api_key = await uuidAPIKey.create()
+
 	const {username, wa_number, subscribe, unsubscribe, session} = await data
-	const post = await {nama:username, nomor:wa_number, status:true, subscribe:'daftar', unsubscribe:'stop', session}
+	const post = await {nama:username, nomor:wa_number, status:true, subscribe:'daftar', unsubscribe:'stop', session, api_key:api_key.apiKey}
 	var query = connection.query('INSERT INTO owner SET ?', post, function (error, results, fields) {
 	  	if (error) throw error;
 	  	cb(results)
@@ -29,7 +32,7 @@ const removeProfile = async (cb) => {
 	await getProfile(async res => {
 		
 		if(res != undefined){
-			await connection.query(`DELETE * FROM owner`, (err, results, field) => {
+			await connection.query(`DELETE FROM owner WHERE id=${res.id}`, (err, results, field) => {
 				cb(results)
 			})
 		}
@@ -50,6 +53,14 @@ const getProfile = async (cb) => {
 	});
 }
 
-module.exports = {postProfile, getProfile, getProfileById, removeProfile, putProfile};
+const isApiExist = async (api_key, cb) => {
+	let query = connection.query(`SELECT * FROM owner WHERE api_key='${api_key}'`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	
+	  	cb(results)
+	});
+}
+
+module.exports = {postProfile, getProfile, getProfileById, removeProfile, putProfile, isApiExist};
 
 

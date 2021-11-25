@@ -16,11 +16,19 @@ const postContact = async (data, cb) => {
 			});
 		})
 	} else {
+
+		checkIfContactExist(wa_number, (result) => {
+			if(result.length == 0){
+				var query = connection.query('INSERT INTO kontaks SET ?', post, function (error, results, fields) {
+				  	if (error) throw error;
+				  	cb(results)
+				});
+			} else {
+				cb(false)
+			}
+
+		})
 		
-		var query = connection.query('INSERT INTO kontaks SET ?', post, function (error, results, fields) {
-		  	if (error) throw error;
-		  	cb(results)
-		});
 	}
 }
 
@@ -44,6 +52,7 @@ const removeContact = async (data, cb) => {
 	  	cb(results)
 	});
 }
+
 
 const getContactById = async (id, cb) => {
 	await db.get(id).then(async (result) => {

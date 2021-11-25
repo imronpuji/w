@@ -5,7 +5,7 @@ block content
     form(action='/campaign',method='post')
       input(type='hidden',value="#{groups[0]['id']}", name='groups')
     
-      label(for='Hari') Hari
+      label(for='Hari') Waktu
          select(id="xxx", name="type")
           option(value="days") Hari
           option(value="hour") Jam
@@ -13,7 +13,7 @@ block content
       label(for='value') Nilai
         input(id='value',type='text',value='',name='value')
       label(for='message') Pesan
-        input(id='messages',type='text',value='',name='messages')
+        input(id='messages',type='text',value='@sapaan @nama',name='messages')
       button(class="btn btn-primary", type='submit') Buat Kampanye
 
     div(class="container-fluid")
@@ -30,7 +30,11 @@ block content
               tr
                 td #{campaign.nilai}
                 td #{campaign.tipe}
-                td #{campaign.pesan}
+                td 
+                  form(action="/campaign/edit", method="post")
+                    textarea(type="text", name="pesan") #{campaign.pesan}
+                    input(type="hidden", name="id", value="#{campaign.k_id}")
+                    button(type="submit", class="btn btn-primary") Ubah
                 td 
                   a(class="btn btn-primary", href="/campaign/content/delete/#{campaign.k_id}") Hapus
 

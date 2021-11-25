@@ -9,7 +9,7 @@ var axios = require('axios')
 var { WAConnection, MessageType, ReconnectMode } = require('@adiwajshing/baileys')
 __dirname = path.resolve();
 
-const {getProfile, putProfile, postProfile, removeProfile} = require('../controllers/setting')
+const {getProfile, putProfile, postProfile, removeProfile, isApiExist} = require('../controllers/setting')
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
@@ -39,11 +39,11 @@ async function run () {
 
     conn.connectOptions = {
     /** fails the connection if no data is received for X seconds */
-    maxIdleTimeMs: 999999,
+    maxIdleTimeMs: 10_000,
     /** maximum attempts to connect */
     maxRetries: 10,
     /** max time for the phone to respond to a connectivity test */
-    phoneResponseTime: 15_000,
+    phoneResponseTime: 90_000,
     /** minimum time between new connections */
     connectCooldownMs: 4000,
     /** agent used for WS connections (could be a proxy agent) */
@@ -51,7 +51,7 @@ async function run () {
     /** agent used for fetch requests -- uploading/downloading media */
     fetchAgent: Agent = undefined,
     /** always uses takeover for connecting */
-    alwaysUseTakeover: false,
+    alwaysUseTakeover: true,
     /** log QR to terminal */
     logQR: true
 	} 
@@ -62,14 +62,18 @@ async function run () {
 	    console.log (`credentials updated!`)
 	    const authInfo = await conn.base64EncodedAuthInfo() // get all the auth info we need to restore this session
 	    let user = await conn.user
-	    await postProfile({wa_number:user.jid, username:user.name, address:'null', status:true,  subscribe:'daftar', unsubscribe:'stop', session:JSON.stringify(authInfo, null, '\t')}, async (result) => {
-		    await console.log(result)
-		})
+	    await getProfile(async(result) => {
+	    	if(result == undefined){
+			    await postProfile({wa_number:user.jid, username:user.name, address:'null', status:true,  subscribe:'daftar', unsubscribe:'stop', session:JSON.stringify(authInfo, null, '\t')}, async (result) => {
+				    await console.log(result)
+				})
+	    	} 
+	    })
 	   
 	})
    	
  	await getProfile(async (result) => {
- 		if(result != null){
+ 		if(result != undefined){
  			await conn.loadAuthInfo(JSON.parse(result.session))
  		}
  	})
@@ -97,20 +101,19 @@ async function run () {
 		  })
 	})
 
+    conn.clearAuthInfo();
     await conn.connect ()
-	// conn.autoReconnect = ReconnectMode.onConnectionLost
+    conn.autoReconnect = ReconnectMode.onConnectionLost
+	conn.on("close", async ({ reason, isReconnecting }) => {
+	    console.log(  "Disconnected because " + reason + ", reconnecting: " + isReconnecting )
+	    if (!isReconnecting && reason == "invalid_session") {
+	      	await removeProfile((res) => console.log('profile has been removed'))
+	      	await axios.get('http://localhost:7000/start')
+	      	conn.clearAuthInfo();
+	    }
+  	});
 
-    
 
-    conn.on('close', async ()=> {
-
-  //   	if (fs.existsSync('./auth_info.json')) {
-  //   		await fs.unlinkSync('./auth_info.json')
-		// }
-    	await removeProfile(async(res)=> {
-    		axios.get('https://wa.trenbisnis.net/start')
-    	})
-    })
 
     conn.on('chat-update', async chatUpdate => {
         // `chatUpdate` is a partial object, containing the updated properties of the chat
@@ -178,9 +181,24 @@ async function run () {
 		    
         } else console.log (chatUpdate) // see updates (can be archived, pinned etc.)
     })
-    router.get('/send', async (req, res) => {
-    	const sentMsg  = await conn.sendMessage('6285846224389@s.whatsapp.net', 'oh hello there', MessageType.text)
-    	await res.send('terkirim')
+    router.post('/send', async (req, res, next) => {  
+    	getProfile((result) => {
+    		if(result == undefined){
+    			res.send('gagal')
+    		} else {
+    			isApiExist(req.body.key, async (res) => {
+    				if(res.length > 0){
+						if(req.body.contact != undefined){
+						    await conn.sendMessage(`${req.body.contact}@s.whatsapp.net`, req.body.message, MessageType.text);
+						    return res.send(req.body.contact);
+						}
+    				} 
+    				else {
+    					res.send('api key tidak cocok')    					
+    				}
+    			})
+    		}
+    	})
 	})
 
 	router.post('/send-bulk', async (req, res, next) => {  

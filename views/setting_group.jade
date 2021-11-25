@@ -1,8 +1,26 @@
 extends layout
 
 block content
+
   div(class="container-fluid")
+    br
+    h4 #{group.nama}
+    form(action='/group/edit',method='post')
+      label(for='name') Nama 
+         input(id='name',type='text',value='#{group.nama}',name='name' class="form-label")
+      label(for='desc') Deskripsi
+         input(id='desc',type='text',value='#{group.deskripsi}',name='desc')
+      label(for='grup') Kode Grup
+         input(id='grup',type='text',value='#{group.code}',name='code')
+         input(id='grup',type='hidden',value='#{group.id}',name='id')
+        button(type='submit', class="btn btn-primary") Edit Grup
+  div(class="container-fluid")
+    br
     form(action='/group/sub',method='post')
+      b Setting Otomatis Keluar Group Lain 
+      br
+      i Anda dapat membuat member group #{group.nama} otomatis keluar dari group lainnya, silakan pilih group yang akan dibuat otomatis keluar
+      br
       label(for='group') Pilih Group
          select(id="xxx", name="sub_group")
             -for(var i = 0;i<groups.length;i++){
@@ -12,8 +30,6 @@ block content
               input(id='sapaan',type='hidden',value='#{group.id}',name='groups')
         button(type='submit', class="btn btn-primary") Submit
     br
-    br
-    h5(style="color:rgba(100,100,100,0.8)") unsubscribe dari grup #{group.nama} 
     if setting_groups
       table(class="table table-striped table-light table-bordered")
         thead

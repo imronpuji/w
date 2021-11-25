@@ -11,7 +11,7 @@ var usersRouter = require('./routes/users');
 var path = require('path')
 var fs = require('fs')
 var app = express();
-var {getProfile} = require('./controllers/setting')
+var {getProfile, removeProfile} = require('./controllers/setting')
 var {connect} = require('./conn')
 __dirname = path.resolve();
 
@@ -36,9 +36,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 app.use('/', indexRouter);
 app.use('/wa', usersRouter.router);
-app.use('/start', (req, res, next) => {
-	usersRouter.run()
-	res.redirect('/setting')
+app.use('/start', async (req, res, next) => {
+  await removeProfile( async () => {
+    usersRouter.run()
+    await res.redirect('/setting')
+  })
 });
 
 

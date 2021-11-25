@@ -53,6 +53,13 @@ const removeContentOfCampaign = async ({campaign}, cb) => {
 	});
 }
 
+const removeContentOfCampaignDetail = async ({campaign, kontak}, cb) => {
+	var query = connection.query(`DELETE FROM kampanyes_detail WHERE kampanyes_detail.campaign_id ='${campaign}'`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	cb(results)
+	});
+}
+
 const postCampaignDetail = async ({kontak_id, campaign_id, tipe, status}, cb) => {
 	let post = {kontak_id, campaign_id}
 	await isCampaignDetailExist(kontak_id, campaign_id, async (result) => {
@@ -84,6 +91,18 @@ const getCampaignDetailWithContact = async (kontak_id,type, cb) => {
 	});	
 }
 
+const editCampaignById = async (data, cb) => {
 
-module.exports = {removeContentOfCampaign,isCampaignExistWithGroup, getCampaign, postCampaign,removeCampaign, postCampaignDetail, getCampaignByGroupId, isCampaignDetailExist, getCampaignDetailWithContact};
+	const {pesan, id} = await data
+
+	console.log(data)
+	var query = await connection.query(`UPDATE kampanyes SET pesan='${pesan}' WHERE id=${id}`,  function (error, results, fields) {
+	  	if (error) throw error;
+	  	
+	  	cb(results)
+	})
+
+}
+
+module.exports = {removeContentOfCampaign,removeContentOfCampaignDetail, isCampaignExistWithGroup,editCampaignById, getCampaign, postCampaign,removeCampaign, postCampaignDetail, getCampaignByGroupId, isCampaignDetailExist, getCampaignDetailWithContact};
 
