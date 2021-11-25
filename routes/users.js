@@ -2,7 +2,7 @@ var express = require('express');
 var path = require('path')
 var router = express.Router();
 var {verifyContact, checkIfContactExist, postContact} = require('../controllers/contact')
-var {getGroupByCode, postGroupsDetails, removeContactInGroupDetail, isGroupExist, getGroupsDetailWithId} = require('../controllers/group')
+var {getGroupByCode, postGroupsDetails, getGroupsDetailWithContact, editGroupDetails, removeContactInGroupDetail, isGroupExist, getGroupsDetailWithId} = require('../controllers/group')
 var fs = require('fs')
 var qrcode = require('qrcode')
 var axios = require('axios')
@@ -124,17 +124,34 @@ async function run () {
             let reg = message.message.conversation.toLowerCase()
 			let a = message.message.conversation.split('#')
 
-			await getProfile((profile) => {
+			await getProfile(async (profile) => {
 				if(reg == profile.subscribe.toLowerCase()){
-			    	verifyContact(message.message.jid, (res) => {
-			    		conn.sendMessage(message.message.jid, 'Selamat Anda Sudah Terdaftar')
-			    	})
+					let contacts = message.key.remoteJid.substr(0, message.key.remoteJid.length - 15);
+					await checkIfContactExist(contacts, async(result) => {
+						if(result.length > 0){
+							console.log(result, 'rrrrrrrrrrrrrrrrrrrrrrrr')
+							await getGroupsDetailWithContact({c_id:result[0]['id']}, async(resGroupDetail) => {
+								await resGroupDetail.filter(async val => {
+									if(val.status_grup == 0){
+										console.log(val, 'vallllllllllllllllllllllllllll')
+										await editGroupDetails(val.g_d_id, (resEditGroup) => {
+											return resEditGroup
+										})
+									}
+								})
+							})
+							console.log(message.key.remoteJid, 'keyyyyyyyyyyyyyyyyyyyyyyyy')
+							await conn.sendMessage(message.key.remoteJid, 'Selamat Anda Sudah Terdaftar', MessageType.text)
+						} else {
+							await conn.sendMessage(message.key.remoteJid, 'Anda Tidak Terdaftar', MessageType.text)
+						}
+					})
 				}
 
 				if(a[0].toLowerCase() == profile.subscribe.toLowerCase() && a[1]){
 					getGroupByCode(a[1], async (resultGrup) => {
 						if(resultGrup.length > 0){
-							let contacts = message.key.remoteJid.substr(0, message.key.remoteJid.length - 15);
+							let contacts = await message.key.remoteJid.substr(0, message.key.remoteJid.length - 15);
 							checkIfContactExist(contacts, async (result) => {
 								if(result.length == []){
 									await postContact({wa_number:contacts, address:a[4], username:a[2], called:a[3]}, async (result) => {
@@ -179,7 +196,7 @@ async function run () {
 				}
 			})
 		    
-        } else console.log (chatUpdate) // see updates (can be archived, pinned etc.)
+        } else console.log (chatUpdate.messages) // see updates (can be archived, pinned etc.)
     })
     router.post('/send', async (req, res, next) => {  
     	getProfile((result) => {

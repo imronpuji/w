@@ -95,6 +95,13 @@ const getGroupsDetailWithId = async ({g_id, c_id, }, cb) => {
 	});
 }
 
+const getGroupsDetailWithContact = async ({c_id}, cb) => {
+	var query = connection.query(`SELECT grup_details.id as g_d_id, grup_details.grup_id as g_id, status_grup FROM grup_details WHERE grup_details.kontak_id = '${c_id}'`, function (error, results, fields) {
+	  	if (error) throw error;
+	  	cb(results)
+	});
+}
+
 const getGroupsDetailsById = async (id,cb) => {
 	var query = connection.query(`SELECT *,grup_details.date as g_d_date, grups.nama AS nama_grup, grup_details.id as g_d_id, grups.id AS g_id, kontaks.id AS k_id FROM grups INNER JOIN grup_details ON grups.id = grup_id INNER JOIN kontaks ON grup_details.kontak_id = kontaks.id WHERE grups.id = ${id}`, function (error, results, fields) {
 	  	if (error) throw error;
@@ -110,9 +117,9 @@ const isGroupExist = (id, cb) => {
 	  	cb(results)
 	});
 }
-const postGroupsDetails = async ({groups, contacts, date}, cb) => {
+const postGroupsDetails = async ({groups, contacts, date, validate}, cb) => {
 	
-	let post = {kontak_id:contacts, grup_id:`${groups}`, date:date != undefined ? date : new Date()}
+	let post = {kontak_id:contacts, grup_id:`${groups}`, date:date != undefined ? date : new Date(), status_grup:validate==undefined?true:false}
 	var query = connection.query('INSERT INTO grup_details SET ?', post, function (error, results, fields) {
 	  	if (error) throw error;
 	  	
@@ -138,13 +145,22 @@ const removeContactInGroupDetail = async ({groups}, cb) => {
 	});
 }
 
+
+
 const editGroupById = async (data, cb) => {
-
 	const {name, desc, code, id} = await data
-
 	const post = await {nama:name, deskripsi:desc, code}
-
 	var query = await connection.query(`UPDATE grups SET nama='${name}', deskripsi='${desc}', code='${code}'  WHERE id=${id}`,  function (error, results, fields) {
+	  	if (error) throw error;
+	  	cb(results)
+	})
+}
+
+const editGroupDetails = async (id, cb) => {
+
+	let date = new Date()
+	console.log(date)
+	var query = await connection.query(`UPDATE grup_details SET status_grup='1', date=CURTIME()  WHERE id=${id}`,  function (error, results, fields) {
 	  	if (error) throw error;
 	  	
 	  	cb(results)
@@ -154,6 +170,7 @@ const editGroupById = async (data, cb) => {
 
 
 module.exports = {
+	editGroupDetails,  
 	postGroup,
 	getGroupsDetailsById,
 	removeGroup, 
@@ -169,7 +186,8 @@ module.exports = {
 	removeSettingGroupById,
 	isGroupExist,
 	getGroupsDetailWithId,
-	editGroupById
+	editGroupById,
+	getGroupsDetailWithContact
 };
 
 

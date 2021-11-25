@@ -4,7 +4,7 @@ var {postContact, getContact, removeContact} = require('../controllers/contact')
 var {postBroadcast} = require('../controllers/broadcast')
 var {postProfile, putProfile, getProfile} = require('../controllers/setting')
 var {postCampaign, removeContentOfCampaignDetail, getCampaign,getCampaignByGroupId, postCampaignDetail,editCampaignById, isCampaignExistWithGroup, getCampaignDetailWithContact, removeCampaign,removeContentOfCampaign, isCampaignDetailexist} = require('../controllers/campaign')
-var {postGroup, getGroupByCode, editGroupById, removeSettingGroupById, putSubGroup, getGroupsDetailsById,getSettingGroupById, removeContactInGroupDetail, getGroupById, getGroup, getGroupsDetails, postGroupsDetails, getDetailsGroup, removeGroup, removeGroupDetail} = require('../controllers/group')
+var {postGroup, getGroupByCode,getGroupsDetailWithContact, editGroupById, removeSettingGroupById, putSubGroup, getGroupsDetailsById,getSettingGroupById, removeContactInGroupDetail, getGroupById, getGroup, getGroupsDetails, postGroupsDetails, getDetailsGroup, removeGroup, removeGroupDetail} = require('../controllers/group')
 var axios = require('axios')
 var differenceInMinutes = require('date-fns/differenceInMinutes')
 var {calculateDate} = require('../helper/date')
@@ -28,29 +28,35 @@ router.post('/kontak', async (req, res, next) =>{
 		const sheet = workSheetsFromBuffer[0].data.filter(val => val.length > 0)
 		console.log(sheet)
 		await sheet.filter(async (val, index) => {
-			if(index != 0){
-				getGroupByCode(val[4], async (resultCode) => {
-					await postContact({username:val[1], called:val[2], address:val[3], wa_number:val[0]}, async resPostContact => {
-						if(resPostContact != false){
-							await postGroupsDetails({contacts:resPostContact.insertId, groups:resultCode[0]['id'], date:new Date(new Date().setMinutes(new Date().getMinutes() + index ))}, async () => {
-								return res
-							})
-						} 
+			if(index != 0 ){
+				if( val[1] != null && val[0] != null){
+					getGroupByCode(val[4], async (resultCode) => {
+						await postContact({username:val[1], called:val[2], address:val[3], wa_number:val[0]}, async resPostContact => {
+							if(resPostContact != false){
+								await postGroupsDetails({contacts:resPostContact.insertId, groups:resultCode[0]['id'], date:new Date(new Date().setMinutes(new Date().getMinutes() + index ))}, async () => {
+									return res
+								})
+							} 
+						})
 					})
-				})
+				}
 			}
 		})
 		await res.redirect('back')
 	} else {
 		await postContact(req.body, async (val) =>  {
-			postGroupsDetails({groups:req.body.groups, contacts:val.insertId}, () => {
-				res.redirect('/kontak')
-			})	
+			if(val !=false){
+				postGroupsDetails({groups:req.body.groups, contacts:val.insertId}, () => {
+					res.redirect('/kontak')
+				})	
+			} else {
+					res.redirect('/kontak')
+			}
 		})
 	}
 })
 router.post('/kontak/group', async (req, res, next) => await postContact(req.body, async (valContact) =>  {
-	await postGroupsDetails({groups:req.body.group, contacts:valContact.insertId}, async (val)=> {
+	await postGroupsDetails({groups:req.body.group, contacts:valContact.insertId, validate:true}, async (val)=> {
 		await getSettingGroupById(req.body.group, async (result) => {
 			await result.filter(async val => {
 				if(val.grup_id != undefined){
@@ -73,10 +79,28 @@ router.post('/kontak/group', async (req, res, next) => await postContact(req.bod
 	
 	await res.redirect('/kontak')
 }))
-router.get('/kontak/delete/:id', async (req, res, next) => await removeContact({id:req.params.id}, async (val) =>  res.redirect('/kontak')))
+router.get('/kontak/delete/:id', async (req, res, next) => {
+	await getGroupsDetailWithContact({c_id:req.params.id}, async (result) => {
+			await result.filter(async val => {
+				await removeContactInGroupDetail({groups:val.g_d_id}, async() => {
+					await getCampaignByGroupId(val.g_id, async (resCampaign) => {
+						await resCampaign.filter(async val => {
+							await removeContentOfCampaignDetail({campaign:val.k_id}, async(result) => {
+							})
+						})
+					}) 
+				await removeContact({id:req.params.id}, async (val) =>  res.redirect('/kontak'))
+				})
+			})
+			if(result.length == 0){
+				await removeContact({id:req.params.id}, async (val) =>  res.redirect('/kontak'))
+			}
+		})
+
+})
 
 // groups
-router.get('/group', (req, res, next) => getGroup(async (result) => await res.render('group', {groups:result, url:req.headers.host})))
+router.get('/group', (req, res, next) => getGroup(async (result) => await res.render('group', {groups:result})))
 router.post('/group', async (req, res, next) => await postGroup(req.body, async (val) =>  res.redirect('/group')))
 router.get('/group/delete/:id', async (req, res, next) => {
 	await getGroupsDetailsById(req.params.id, async (result) => {
@@ -120,7 +144,7 @@ router.get('/group/delete/:id', async (req, res, next) => {
 router.get('/groups/detail/:id', (req, res, next) => getGroupsDetailsById(req.params.id,async (result, val) => {
 		await getContact(async (contacts) => {
 			await getGroupById(req.params.id, async (resGroupsDetail) => {
-		 		await res.render('group_detail', {groups:resGroupsDetail, contacts, groups_detail:result})
+		 		await res.render('group_detail', {groups:resGroupsDetail, contacts, groups_detail:result, url:req.headers.host})
 			})
 		})
 }))
@@ -132,15 +156,15 @@ router.post('/groups/detail', async (req, res, next) => {
 		console.log(sheet)
 		await sheet.filter(async (val, index) => {
 			if(index != 0){
-				await postContact({username:val[1], called:val[2], address:val[3], wa_number:val[0]}, async resPostContact => {
-					if(resPostContact != false){
-						await postGroupsDetails({contacts:resPostContact.insertId, groups:req.body.groups, date:new Date(new Date().setMinutes(new Date().getMinutes() + index ))}, async () => {
-							return res
-						})
-					} 
-					
-
-				})
+				if( val[1] != null && val[0] != null){
+					await postContact({username:val[1], called:val[2], address:val[3], wa_number:val[0]}, async resPostContact => {
+						if(resPostContact != false){
+							await postGroupsDetails({contacts:resPostContact.insertId, groups:req.body.groups, date:new Date(new Date().setMinutes(new Date().getMinutes() + index ))}, async () => {
+								return res
+							})
+						} 
+					})
+				}
 			}
 		})
 		await res.redirect('back')
@@ -162,8 +186,10 @@ router.post('/group/edit', async(req, res, next) => {
 // campaign
 router.get('/campaign/:id', (req, res, next) => getGroupById(req.params.id, async (result) => {
 	console.log(result)
-	getCampaignByGroupId(result[0].id, async (resCampaign) => {
-		await res.render('campaign', {groups:result, campaigns:resCampaign})
+	await getProfile(async (resultProfile) => {
+		await getCampaignByGroupId(result[0].id, async (resCampaign) => {
+			await res.render('campaign', {groups:result, campaigns:resCampaign, unsub:resultProfile == undefined ? 'stop' : resultProfile.unsubscribe})
+		})
 	})
 }))
 

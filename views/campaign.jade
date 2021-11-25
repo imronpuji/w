@@ -12,10 +12,20 @@ block content
           option(value="minutes") Menit
       label(for='value') Nilai
         input(id='value',type='text',value='',name='value')
+      br
       label(for='message') Pesan
-        input(id='messages',type='text',value='@sapaan @nama',name='messages')
-      button(class="btn btn-primary", type='submit') Buat Kampanye
+      br
+      textarea(id='messages',type='text', name='messages', style="width:450px") @sapaan @nama
+        | 
+        |[PESAN ANDA DI SINI]
 
+        |----------
+
+        | 
+        |Anda menerima pesan ini karena telah terdaftar di *#{groups[0]['nama']}*, Anda dapat berhenti kapan saja dengan mengetikkan *#{unsub}##{groups[0]['code']}*.                                   
+      br
+      button(class="btn btn-primary", type='submit') Buat Kampanye
+    br
     div(class="container-fluid")
       if campaigns
         table(class="table table-striped table-light table-bordered")

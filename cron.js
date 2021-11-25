@@ -14,7 +14,8 @@ async function job(url){
 						getGroupsDetailsById(val.grup_id, async (res) => {
 							if(res.length > 0) {
 							    await res.filter(async(vals) => {
-						  			let message = val['pesan'].replace(/@nama/g, vals.nama).replace(/@sapaan/g, vals.sapaan)
+						  			let sapaan = vals.sapaan == null ? "" : vals.sapaan
+						  			let message = val['pesan'].replace(/@nama/g, vals.nama).replace(/@sapaan/g, sapaan)
 									let userDate = new Date(vals.g_d_date)
 									let userDateFuture  = userDate.setHours(userDate.getHours() + parseInt(val['nilai']))
 									let userDateForChecking = new Date(userDateFuture).toLocaleTimeString([],time)
@@ -38,7 +39,8 @@ async function job(url){
 							    await res.filter(async(vals) => {
 									
 
-						  			let message = val['pesan'].replace(/@nama/g, vals.nama).replace(/@sapaan/g, vals.sapaan)
+						  			let sapaan = vals.sapaan == null ? "" : vals.sapaan
+						  			let message = val['pesan'].replace(/@nama/g, vals.nama).replace(/@sapaan/g, sapaan)
 									let userDate = new Date(vals.g_d_date)
 									let userDateFuture  = userDate.setMinutes(userDate.getMinutes() + parseInt(val['nilai']))
 									let userDateForChecking = new Date(userDateFuture).toLocaleTimeString([],time)
@@ -62,7 +64,8 @@ async function job(url){
 						getGroupsDetailsById(val.grup_id, async (res) => {
 							if(res.length > 0) {
 							    await res.filter(async(vals) => {
-							    	let message = val['pesan'].replace(/@nama/g, vals.nama).replace(/@sapaan/g, vals.sapaan)
+							    	let sapaan = vals.sapaan == null ? "" : vals.sapaan
+							    	let message = val['pesan'].replace(/@nama/g, vals.nama).replace(/@sapaan/g, sapaan)
 									let userDate = new Date(vals.g_d_date)
 									let userDateFuture  = userDate.setDate(userDate.getDate() + parseInt(val['nilai']))
 									let userDateForChecking = new Date(userDateFuture).toLocaleTimeString([],time)

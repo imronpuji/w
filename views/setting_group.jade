@@ -14,6 +14,19 @@ block content
          input(id='grup',type='text',value='#{group.code}',name='code')
          input(id='grup',type='hidden',value='#{group.id}',name='id')
         button(type='submit', class="btn btn-primary") Edit Grup
+    br
+    h4 Formulir
+    textarea(type="text", style="width:50%", disabled) <form style="border: 2px solid rgba(100,100,100,0.2); display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 8px; width: 30%" method="post" action="http://localhost:7000/kontak/group">
+      <input style="width:100%; height:42px; margin:8px; border:none; background: rgba(100,100,100,0.2); text-align: center; border-radius: 4px; " placeholder="username" name="username"/>
+      <input style="width:100%; height:42px; margin:8px; border:none; background: rgba(100,100,100,0.2); text-align: center; border-radius: 4px; " type="hidden" name="group" value="#{group.id}"/>
+      <input style="width:100%; height:42px; margin:8px; border:none; background: rgba(100,100,100,0.2); text-align: center; border-radius: 4px; " placeholder="Nomor Wa" name="wa_number"/>
+      <input style="width:100%; height:42px; margin:8px; border:none; background: rgba(100,100,100,0.2); text-align: center; border-radius: 4px; " placeholder="Alamat" name="address"/>
+      <input style="width:100%; height:42px; margin:8px; border:none; background: rgba(100,100,100,0.2); text-align: center; border-radius: 4px; " placeholder="Panggilan" name="called"/>
+      <input style="width:100%; height:42px; margin:8px; border:none; background: rgba(100,100,100,0.2); text-align: center; border-radius: 4px; " type="hidden" name="validate" value="true"/>
+      <br>
+      <button style="width: 100%; height: 42px; border:none; margin:3px">Daftar</button></form>
+    </form>
+
   div(class="container-fluid")
     br
     form(action='/group/sub',method='post')

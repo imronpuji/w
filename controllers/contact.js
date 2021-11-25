@@ -4,11 +4,13 @@ const moment = require('moment')
 var axios = require('axios')
 
 let {connection} = require('../conn');
+var {getGroupsDetailWithContact, editGroupDetails} = require('./group')
 
 const postContact = async (data, cb) => {
+	console.log(data)
 	const {username, wa_number, address, called, group, validate} = await data
-	const post = await {nama:username, nomor:wa_number, alamat:address, sapaan: called, date:new Date(), status:validate == undefined ? true : false}
-	if(validate != undefined && validate == true) {
+	if(validate == 'true') {
+	const post = await {nama:username, nomor:wa_number, alamat:address, sapaan: called, date:new Date(), status:validate}
 		sendContactVerify(wa_number, async () => {
 			var query = connection.query('INSERT INTO kontaks SET ?', post, function (error, results, fields) {
 			  	if (error) throw error;
@@ -16,6 +18,7 @@ const postContact = async (data, cb) => {
 			});
 		})
 	} else {
+	const post = await {nama:username, nomor:wa_number, alamat:address, sapaan: called, date:new Date(), status:true}
 
 		checkIfContactExist(wa_number, (result) => {
 			if(result.length == 0){
@@ -72,20 +75,26 @@ const sendContactVerify=async (number, cb)=> {
 	await axios.post('http://localhost:7000/wa/send-bulk', {contact:`${number}`, message:'silahkan ketik daftar untuk menverifikasi'}).then(results => cb(results)).catch(err => err)
 }
 
-const verifyContact=async(_id, cb)=>{
-	let num = _id.substr(0, _id.length - 5);
-	
-	db.upsert(num, function (doc) {
-		if (!doc.status) {
-	    doc.status = true;
-	  	return doc;
-	}
-	}).then(function (res) {
-	  	cb(res)
-	}).catch(async function (err) {
-	  	await axios.post('http://localhost:7000/wa/send-bulk', {contact:num, message:'Maaf Anda Belum Terdaftar di sistem kami'}).then(results => cb(results)).catch(err => err)
+const verifyContact=async(number, cb)=>{
+	await checkIfContactExist(number, async(result) => {
+		if(result.length > 0){
+			console.log(result)
+			await getGroupsDetailWithContact({c_id:result[0]['id']}, async(resGroupDetail) => {
+				await resGroupDetail.filter(async val => {
+					console.log(val)
+					if(val.status_grup == 0){
+						await editGroupDetails(val.g_d_id, () => {
+							cb('success')
+						})
+					}
+				})
+			})
+		} else {
+			cb('failed')
+		}
 	})
 }
+
 
 module.exports = {postContact, getContact, getContactById, removeContact, verifyContact, checkIfContactExist};
 

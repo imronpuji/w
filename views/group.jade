@@ -3,13 +3,13 @@ extends layout
 block content
   div(class="container-fluid")
     form(action='/group',method='post')
-      label(for='name') Nama 
+      label(for='name') Nama Grup
          input(id='name',type='text',value='',name='name' class="form-label")
-      label(for='desc') Deskripsi
-         input(id='desc',type='text',value='',name='desc')
       label(for='grup') Kode Grup
          input(id='grup',type='text',value='',name='code')
-        button(type='submit', class="btn btn-primary") Submit
+      label(for='desc') Deskripsi
+         input(id='desc',type='text',value='',name='desc')
+        button(type='submit', class="btn btn-primary") Buat Grup
   br
   br  
   
@@ -33,6 +33,7 @@ block content
                 a(class="btn btn-primary" style="margin-right:4px"  href="/setting/group/#{group.id}") Setting Grup
                 a(class="btn btn-primary" style="margin-right:4px" href="/groups/detail/#{group.id}") Detail Member
                 a(class="btn btn-primary" style="margin-right:4px" href="/campaign/#{group.id}") Detail Kampanye
+                  
               td  
                 a(class="btn btn-primary" href="/group/delete/#{group.id}") Hapus
 
